@@ -34,6 +34,7 @@ class addUser extends Migration
             'phone_number' => [
                 'type' => 'VARCHAR',
                 'constraint' => 9,
+                'null' => true,
             ],
             'password' => [
                 'type' => 'VARCHAR',
