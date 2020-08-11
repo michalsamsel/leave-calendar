@@ -6,6 +6,7 @@ use CodeIgniter\Database\Migration;
 
 class addLeave extends Migration
 {
+    // This table keeps information about every leave that user had.
     public function up()
     {
         $this->db->disableForeignKeyChecks();
@@ -29,14 +30,17 @@ class addLeave extends Migration
             ],
             'from' => [
                 'type' => 'DATE',
+                'comment' => 'First day of leave.',
             ],
             'to' => [
                 'type' => 'DATE',
+                'comment' => 'Last day of leave.',
             ],
             'working_days_used' => [
                 'type' => 'INT',
                 'constraint' => 2,
                 'unsigned' => true,
+                'comment' => 'It keeps information how many working days user missed on leave.',
             ],
         ]);
 

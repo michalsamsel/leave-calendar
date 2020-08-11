@@ -6,6 +6,7 @@ use CodeIgniter\Database\Migration;
 
 class addLeaveType extends Migration
 {
+    //This dictionary table keeps different values of diffrent types of leave.
     public function up()
     {
         $this->forge->addField([
@@ -17,6 +18,7 @@ class addLeaveType extends Migration
             'name' => [
                 'type' => 'VARCHAR',
                 'constraint' => '100',
+                'comment' => 'Name of leave type.',
             ],
         ]);
 

@@ -6,6 +6,7 @@ use CodeIgniter\Database\Migration;
 
 class addCalendarUser extends Migration
 {
+    // This table saves information about users who joined calendars and users role in company.
     public function up()
     {
         $this->db->disableForeignKeyChecks();

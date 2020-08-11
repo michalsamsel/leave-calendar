@@ -6,6 +6,7 @@ use CodeIgniter\Database\Migration;
 
 class addCalendar extends Migration
 {
+    // This table saves information about existing calendars.
     public function up()
     {
         $this->db->disableForeignKeyChecks();
@@ -22,10 +23,12 @@ class addCalendar extends Migration
             'name' => [
                 'type' => 'VARCHAR',
                 'constraint' => 255,
+                'comment' => 'Name of calendar which displays in list for users.',
             ],
             'invite_code' => [
                 'type' => 'VARCHAR',
                 'constraint' => 10,
+                'comment' => 'Thanks to this code users can join to specific calendar.',
             ],
         ]);
 

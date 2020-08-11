@@ -6,6 +6,7 @@ use CodeIgniter\Database\Migration;
 
 class addUser extends Migration
 {
+    // This table keeps information about users and their data required to log in.
     public function up()
     {
         $this->db->disableForeignKeyChecks();
@@ -30,15 +31,12 @@ class addUser extends Migration
             'email' => [
                 'type' => 'VARCHAR',
                 'constraint' => 100,
-            ],
-            'phone_number' => [
-                'type' => 'VARCHAR',
-                'constraint' => 9,
-                'null' => true,
+                'comment' => 'Used to log in to website.',
             ],
             'password' => [
                 'type' => 'VARCHAR',
                 'constraint' => 255,
+                'comment' => 'Used to log in to website. Keep it encryptioned.',
             ],
         ]);
 

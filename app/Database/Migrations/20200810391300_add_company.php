@@ -6,6 +6,7 @@ use CodeIgniter\Database\Migration;
 
 class addComapny extends Migration
 {
+    // This table saves information about companies.
     public function up()
     {
         $this->db->disableForeignKeyChecks();
@@ -18,18 +19,22 @@ class addComapny extends Migration
             'owner_id' => [
                 'type' => 'INT',
                 'unsigned' => true,
+                'comment' => 'This saves information which user is owner of company.',
             ],
             'name' => [
                 'type' => 'VARCHAR',
                 'constraint' => 255,
+                'comment' => 'Name of company',
             ],
             'nip' => [
                 'type' => 'VARCHAR',
-                'constraint' => 11,
+                'constraint' => 10,
+                'comment' => 'Tax identification number.',
             ],
             'city' => [
                 'name' => 'VARCHAR',
                 'constraint' => 255,
+                'comment' => 'Information for generting pdf, where company is registered.',
             ],
         ]);
 

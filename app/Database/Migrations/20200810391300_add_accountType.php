@@ -6,6 +6,7 @@ use CodeIgniter\Database\Migration;
 
 class addAccountType extends Migration
 {
+    // This dictionary table should keep two different values of accounts users can create.
     public function up()
     {
         $this->forge->addField([
@@ -17,6 +18,7 @@ class addAccountType extends Migration
             'name' => [
                 'type' => 'VARCHAR',
                 'constraint' => '100',
+                'comment' => 'Name of account type.',
             ],
         ]);
 
