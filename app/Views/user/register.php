@@ -14,11 +14,14 @@
     <label for="password">Hasło:</label>
     <input type="password" name="password" /> <br /><br />
 
+    <label for="password_validate">Powtórz hasło:</label>
+    <input type="password" name="password_validate" /> <br /><br />
+
     <label for="account_type_id">Typ konta:</label> <br />
 
     <?php foreach (esc($accounts) as $account) : ?>
     <label for="<?= esc($account['id'])?>"> <?= esc($account['name']) ?> </label>
-    <input type="radio" id="<?= esc($account['id'])?>" name="account_type_id"/> <br />
+    <input type="radio" value="<?= esc($account['id'])?>" name="account_type_id"/> <br />
     <?php endforeach ?>
 
     <input type="submit" name="submit" value="Zarejestruj się" />
