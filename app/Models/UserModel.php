@@ -13,8 +13,8 @@ class UserModel extends Model
     {
         $data = [
             'account_type_id' => $accountType,
-            'first_name' => $firstName,
-            'last_name' => $lastName,
+            'first_name' => ucfirst(strtolower($firstName)),
+            'last_name' => ucfirst(strtolower($lastName)),
             'email' => $email,
             'password' => $password,
         ];
@@ -28,7 +28,9 @@ class UserModel extends Model
     public function findEmail($email = null)
     {
         if (is_string($email)) {
-            return $this->findAll($email);
+            return $this->asArray()
+                ->where(['email' => $email])
+                ->first();
         }
     }
 }

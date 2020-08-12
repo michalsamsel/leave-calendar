@@ -17,8 +17,7 @@ class User extends Controller
         if ($this->request->getMethod() === 'post' && $this->validate([
             'first_name' => 'alpha|min_length[3]|max_length[100]',
             'last_name' => 'alpha_dash|min_length[3]|max_length[100]',
-            'email' => 'valid_email|max_length[100]',
-            //isEmailUsed
+            'email' => 'valid_email|max_length[100]|isEmailUsed',
             'password' => 'min_length[6]|max_length[16]',
             'password_validate' => 'matches[password]',
             'account_type_id' => 'in_list[1,2]',
