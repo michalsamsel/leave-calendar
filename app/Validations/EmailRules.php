@@ -8,9 +8,9 @@ class EmailRules
 {
     public function isEmailUsed(string $email): bool
     {
-        $userModel = new UserModel();        
+        $userModel = new UserModel();
 
-        if (!$userModel->findEmail($email)) {
+        if (!$userModel->emailVerify($email)) {
             return true;
         }
         return false;

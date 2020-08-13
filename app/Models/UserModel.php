@@ -29,8 +29,19 @@ class UserModel extends Model
     {
         if (is_string($email)) {
             return $this->asArray()
+                ->select('email')
                 ->where(['email' => $email])
                 ->first();
+        }
+    }
+
+    public function getPassword($email = null)
+    {
+        if(is_string($email)) {
+            return $this->asArray()
+            ->select('password')
+            ->where(['email' => $email])
+            ->first();
         }
     }
 }
