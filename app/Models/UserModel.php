@@ -25,7 +25,7 @@ class UserModel extends Model
         }
     }
 
-    public function findEmail($email = null)
+    public function emailVerify($email = null)
     {
         if (is_string($email)) {
             return $this->asArray()
@@ -35,13 +35,23 @@ class UserModel extends Model
         }
     }
 
-    public function getPassword($email = null)
+    public function passwordVerify($email = null)
     {
-        if(is_string($email)) {
+        if (is_string($email)) {
             return $this->asArray()
-            ->select('password')
-            ->where(['email' => $email])
-            ->first();
+                ->select('password')
+                ->where(['email' => $email])
+                ->first();
+        }
+    }
+
+    public function getUserData($email)
+    {
+        if (is_string($email)) {
+            return $this->asArray()
+                ->select(['id', 'account_type_id', 'first_name', 'last_name'])
+                ->where(['email' => $email])
+                ->first();
         }
     }
 }
