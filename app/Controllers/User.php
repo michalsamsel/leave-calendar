@@ -13,9 +13,13 @@ class User extends Controller
         $session = session();
         if ($session->get('id') !== null) {
             if ($session->get('account_type_id') == 1) {
-                echo 'Jestem pracodawcą';
+                echo view('Views/templates/header');
+                echo view('Views/user/companyOwner');
+                echo view('Views/templates/footer');
             } else if ($session->get('account_type_id') == 2) {
-                echo 'Jestem pracownikiem';
+                echo view('Views/templates/header');
+                echo view('Views/user/companyWorker');
+                echo view('Views/templates/footer');
             } else {
                 return redirect('/');
             }

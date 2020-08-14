@@ -13,9 +13,9 @@ class CompanyModel extends Model
     {
         $data = [
             'owner_id' => $owner_id,
-            'name' => $name,
+            'name' => ucfirst(strtolower($name)),
             'nip' => $nip,
-            'city' => $city,
+            'city' => ucfirst(strtolower($city)),
         ];
 
         if(!in_array(null, $data)){
