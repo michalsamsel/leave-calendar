@@ -1,0 +1,1 @@
+<a href="/calendar/join">Dołącz do kalendarza</a> <br />
