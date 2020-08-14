@@ -10,6 +10,18 @@ class User extends Controller
 {
     public function index()
     {
+        $session = session();
+        if ($session->get('id') !== null) {
+            if ($session->get('account_type_id') == 1) {
+                echo 'Jestem pracodawcą';
+            } else if ($session->get('account_type_id') == 2) {
+                echo 'Jestem pracownikiem';
+            } else {
+                return redirect('/');
+            }
+        } else {
+            return redirect('/');
+        }
     }
 
     public function register()
@@ -19,10 +31,12 @@ class User extends Controller
                 'in_list' => 'Wybierz jeden z dwóch typów konta.',
             ],
             'first_name' => [
+                'alpha' => 'Podaj swoje imię bez polskich znaków.',
                 'min_length' => 'W polu Imie jest zbyt mało znaków (minimum 3 znaki).',
                 'max_length' => 'W polu Imie jest zbyt dużo znaków (maksymalnie 100 znaków).',
             ],
             'last_name' => [
+                'alpha_dash' => 'Podaj swoje nazwisko bez polskich znaków',
                 'min_length' => 'W polu Nazwisko jest zbyt mało znaków (minimum 3 znaki).',
                 'max_length' => 'W polu Nazwisko jest zbyt dużo znaków (maksymalnie 100 znaków).',
             ],
@@ -42,8 +56,8 @@ class User extends Controller
 
         if ($this->request->getMethod() === 'post' && $this->validate([
             'account_type_id' => 'in_list[1,2]',
-            'first_name' => 'min_length[3]|max_length[100]',
-            'last_name' => 'min_length[3]|max_length[100]',
+            'first_name' => 'alpha|min_length[3]|max_length[100]',
+            'last_name' => 'alpha_dash|min_length[3]|max_length[100]',
             'email' => 'valid_email|max_length[100]|isEmailUsed',
             'password' => 'min_length[6]|max_length[16]',
             'password_validate' => 'matches[password]',
@@ -56,10 +70,7 @@ class User extends Controller
                 $this->request->getPost('email'),
                 $this->request->getPost('password')
             );
-
-            echo view('Views/templates/header');
-            echo 'Rejestracja przebiegła pomyślnie.';
-            echo view('Views/templates/footer');
+            return redirect()->to('/');
         } else {
             $accountTypeModel = new AccountTypeModel();
             $accountType['accounts'] = $accountTypeModel->getAccountTypes();
@@ -93,14 +104,15 @@ class User extends Controller
 
             echo view('Views/templates/header');
             if (password_verify($this->request->getGet('password'), $databasePassword['password'])) {
-                echo 'Sukces';
+                $session = session();
+                $session->set($userModel->getUserData($this->request->getGet('email')));
+                return redirect('user');
             } else {
                 echo view('Views/templates/header');
-                echo view('Views/user/login');
                 echo '<b>Błędny email lub hasło</b>';
+                echo view('Views/user/login');
                 echo view('Views/templates/footer');
             }
-            echo view('Views/templates/footer');
         } else {
             echo view('Views/templates/header');
             echo view('Views/user/login');
