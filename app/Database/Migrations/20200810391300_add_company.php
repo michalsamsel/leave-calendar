@@ -32,7 +32,7 @@ class addComapny extends Migration
                 'comment' => 'Tax identification number.',
             ],
             'city' => [
-                'name' => 'VARCHAR',
+                'type' => 'VARCHAR',
                 'constraint' => 255,
                 'comment' => 'Information for generting pdf, where company is registered.',
             ],
