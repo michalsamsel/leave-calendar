@@ -31,12 +31,16 @@ $routes->setAutoRoute(true);
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
 $routes->get('/', 'Home::index');
+
 $routes->get('user', 'User::index');
 $routes->match(['get', 'post'], 'user/register', 'User::register');
 $routes->get('user/login', 'User::login');
+
 $routes->match(['get', 'post'], 'company/create', 'Company::create');
+
 $routes->match(['get', 'post'], 'calendar/create', 'Calendar::create');
 $routes->match(['get', 'post'], 'calendar/join', 'Calendar::join');
+$routes->get('calendar/(:alphanum)', 'Calendar::index/$1');
 
 /**
  * --------------------------------------------------------------------

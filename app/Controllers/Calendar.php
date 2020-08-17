@@ -6,9 +6,29 @@ use CodeIgniter\Controller;
 use App\Models\CalendarModel;
 use App\Models\CalendarUserModel;
 use App\Models\CompanyModel;
+use App\Models\UserModel;
 
 class Calendar extends Controller
 {
+    /*
+    *
+    */
+    public function index($invite_code)
+    {
+        $session = session();
+        if (session()->get('account_type_id') == 1) {
+            $userModel = new UserModel();
+            $userList['users'] = $userModel->getUserList($invite_code);
+            echo view('Views/templates/header');
+            echo view('Views/calendar/calendarOwner', $userList);
+            echo view('Views/templates/footer');
+        } else if (session()->get('account_type_id') == 2) {
+            echo view('Views/templates/header');
+            echo view('Views/calendar/calendarWorker');
+            echo view('Views/templates/footer');
+        }
+    }
+
     /*
     * This method creates new calendar on user demand.
     * User passes information about name of new calendar and for which company he creates it.

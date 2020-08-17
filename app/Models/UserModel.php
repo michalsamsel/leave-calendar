@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use App\Models\Calendar;
+use App\Models\CalendarUserModel;
 
 class UserModel extends Model
 {
@@ -10,7 +12,7 @@ class UserModel extends Model
     protected $allowedFields = ['account_type_id', 'first_name', 'last_name', 'email', 'password'];
 
     /*
-    * This method is used to create a new user account.    
+    * This method is used to create a new user account.
     */
 
     public function createUser($accountType = null, $firstName = null, $lastName = null, $email = null, $password = null)
@@ -30,7 +32,7 @@ class UserModel extends Model
     }
 
     /*
-    * This method is used to validate if given email in form during registration is not already used
+    * This method is used to validate if given email in form during registration is not already used.
     */
 
     public function emailVerify($email = null)
@@ -68,5 +70,18 @@ class UserModel extends Model
                 ->where(['email' => $email])
                 ->first();
         }
+    }
+
+    /*
+    * This method gets list of users who joined calendar.
+    */
+    public function getUserList($invite_code)
+    {
+        $calendarModel = new CalendarModel();
+        $calendarUserModel = new CalendarUserModel();
+
+        $calendarId = $calendarModel->getCalendarId($invite_code);
+
+        return $this->query('SELECT u.first_name, u.last_name FROM user AS u, calendar_user AS cu WHERE cu.calendar_id=' . $calendarId['id'] . ' AND cu.user_id=u.id ORDER BY u.last_name, u.first_name;')->getResultArray();
     }
 }
