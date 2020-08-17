@@ -22,7 +22,7 @@ class addCalendarUser extends Migration
             'user_department_id' => [
                 'type' => 'INT',
                 'unsigned' => true,
-                'null' => false,
+                'null' => true,
             ],
         ]);
 

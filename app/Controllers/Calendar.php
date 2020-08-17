@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use CodeIgniter\Controller;
 use App\Models\CalendarModel;
+use App\Models\CalendarUserModel;
 use App\Models\CompanyModel;
 
 class Calendar extends Controller
@@ -15,6 +16,7 @@ class Calendar extends Controller
     */
     public function create()
     {
+        $session = session();
         //Messages for failed validation.
         $ruleMessages = [
             'company_id' => [
@@ -28,11 +30,10 @@ class Calendar extends Controller
         ], $ruleMessages)) {
             $calendarModel = new CalendarModel();
             //Add new calendar to database.
-            $calendarModel->createCalendar($this->request->getPost('company_id'), $this->request->getPost('name'));
+            $calendarModel->createCalendar($session->get('id'), $this->request->getPost('company_id'), $this->request->getPost('name'));
             //After successful creating of calendar redirect user to his main page.
             return redirect('user');
         } else {
-            $session = session();
             $companyModel = new CompanyModel();
             //Get users list of companies which he added to database.
             $companyArray['companies'] = $companyModel->getCompanyArray($session->get('id'));
@@ -40,6 +41,47 @@ class Calendar extends Controller
             //Displaying form of creating calendar for specific company.
             echo view('Views/templates/header');
             echo view('Views/calendar/create', $companyArray);
+            echo view('Views/templates/footer');
+        }
+    }
+
+    /*
+    * This method let's users join calendars created by company owners.
+    * User join callendar by inserting invite code provided by his supervisor.
+    */
+    public function join()
+    {
+        //Messages for failed validation.
+        $ruleMessages = [
+            'invite_code' => [
+                'alpha_numeric' => 'W polu mogą znajdować się tylko znaki od A do Z oraz cyfry od 0 do 9.',
+                'min_length' => 'W polu musi być 6 znaków',
+                'max_length' => 'W polu musi być 6 znaków',
+            ],
+        ];
+        //Check if validation was successful.
+        if ($this->request->getMethod() === 'post' && $this->validate([
+            'invite_code' => 'alpha_numeric|min_length[6]|max_length[6]',
+        ], $ruleMessages)) {
+            $session = session();
+            $calendarUserModel = new CalendarUserModel();
+
+            //Create connection between user and calendar he joins.
+            $joinResult = $calendarUserModel->joinCalendar($session->get('id'), $this->request->getPost('invite_code'));
+            if ($joinResult) {
+                //If user joined calendar redirect him to his main page.
+                return redirect('user');
+            } else {
+                //Display form and information if user inserted wrong code or is already member of calendar.
+                echo view('Views/templates/header');
+                echo view('Views/calendar/join');
+                echo '<b>Podany kod nie istnieje lub użytkownik już należy do podanego kalendarza.</b>';
+                echo view('Views/templates/footer');
+            }
+        } else {
+            //Form for users to join specific calendar.
+            echo view('Views/templates/header');
+            echo view('Views/calendar/join');
             echo view('Views/templates/footer');
         }
     }

@@ -16,6 +16,10 @@ class addCalendar extends Migration
                 'unsigned' => true,
                 'auto_increment' => true,
             ],
+            'owner_id' => [
+                'type' => 'INT',
+                'unsigned' => true,
+            ],
             'company_id' => [
                 'type' => 'INT',
                 'unsigned' => true,
@@ -33,6 +37,7 @@ class addCalendar extends Migration
         ]);
 
         $this->forge->addPrimaryKey('id');
+        $this->forge->addForeignKey('owner_id', 'user', 'id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('company_id', 'company', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('calendar');
         $this->db->enableForeignKeyChecks();

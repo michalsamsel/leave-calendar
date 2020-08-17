@@ -5,6 +5,8 @@ namespace app\Controllers;
 use CodeIgniter\Controller;
 use App\Models\AccountTypeModel;
 use App\Models\UserModel;
+use App\Models\CalendarModel;
+use App\Models\CalendarUserModel;
 
 class User extends Controller
 {
@@ -14,17 +16,22 @@ class User extends Controller
     public function index()
     {
         $session = session();
+
         if ($session->get('id') !== null) {
             //Load page for user with account type of 'company owner'.
             if ($session->get('account_type_id') == 1) {
+                $calendarModel = new CalendarModel();
+                $calendarList['calendars'] = $calendarModel->getOwnerCalendars($session->get('id'));
                 echo view('Views/templates/header');
-                echo view('Views/user/companyOwner');
+                echo view('Views/user/companyOwner', $calendarList);
                 echo view('Views/templates/footer');
             }
             //Load page for user with account type of 'company worker'.
             else if ($session->get('account_type_id') == 2) {
+                $calendarUserModel = new CalendarUserModel();
+                $calendarUserList['calendars'] = $calendarUserModel->getWorkerCalendars($session->get('id'));
                 echo view('Views/templates/header');
-                echo view('Views/user/companyWorker');
+                echo view('Views/user/companyWorker', $calendarUserList);
                 echo view('Views/templates/footer');
             } else {
                 //Other account types shouldnt exist so redirect them to main website.

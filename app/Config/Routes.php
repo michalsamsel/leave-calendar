@@ -36,6 +36,7 @@ $routes->match(['get', 'post'], 'user/register', 'User::register');
 $routes->get('user/login', 'User::login');
 $routes->match(['get', 'post'], 'company/create', 'Company::create');
 $routes->match(['get', 'post'], 'calendar/create', 'Calendar::create');
+$routes->match(['get', 'post'], 'calendar/join', 'Calendar::join');
 
 /**
  * --------------------------------------------------------------------
