@@ -9,6 +9,10 @@ class UserModel extends Model
     protected $table = 'user';
     protected $allowedFields = ['account_type_id', 'first_name', 'last_name', 'email', 'password'];
 
+    /*
+    * This method is used to create a new user account.    
+    */
+
     public function createUser($accountType = null, $firstName = null, $lastName = null, $email = null, $password = null)
     {
         $data = [
@@ -25,6 +29,10 @@ class UserModel extends Model
         }
     }
 
+    /*
+    * This method is used to validate if given email in form during registration is not already used
+    */
+
     public function emailVerify($email = null)
     {
         if (is_string($email)) {
@@ -35,6 +43,10 @@ class UserModel extends Model
         }
     }
 
+    /*
+    * This method is used to download password connected to email and
+      compare it with not hashed password given in form.
+    */
     public function passwordVerify($email = null)
     {
         if (is_string($email)) {
@@ -44,6 +56,9 @@ class UserModel extends Model
                 ->first();
         }
     }
+    /*
+    * This method gets user data which gonna be saved in session.
+    */
 
     public function getUserData($email)
     {

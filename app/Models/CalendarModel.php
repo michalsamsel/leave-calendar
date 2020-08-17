@@ -10,6 +10,12 @@ class CalendarModel extends Model{
     protected $table = 'calendar';
     protected $allowedFields = ['company_id', 'name', 'invite_code'];
 
+    /*
+    * This method is used during creating new calendar by user.
+    * If given code is already used it needs to create a new code.
+    * Every invite code should be unique.
+    */
+
     protected function isInviteCodeUsed($invite_code = null)
     {
         if (is_string($invite_code)) {
@@ -19,6 +25,12 @@ class CalendarModel extends Model{
                 ->first();
         }
     }
+
+    /*
+    * This method is used for add new calendar to database.
+    * It gets values from user like name or company id but it generate invite code on its own.
+    * If user does not pass name to function it takes default name of company which he had to choose in form.
+    */
 
     public function createCalendar($company_id=null, $name=null)
     {
