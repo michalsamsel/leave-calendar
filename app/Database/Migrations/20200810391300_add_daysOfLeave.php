@@ -11,11 +11,6 @@ class addDayOfLeave extends Migration
     {
         $this->db->disableForeignKeyChecks();
         $this->forge->addField([
-            'id' => [
-                'type' => 'INT',
-                'unsigned' => true,
-                'auto_increment' => true,
-            ],
             'calendar_id' => [
                 'type' => 'INT',
                 'unsigned' => true,
