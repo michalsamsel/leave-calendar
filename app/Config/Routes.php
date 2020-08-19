@@ -41,6 +41,7 @@ $routes->match(['get', 'post'], 'company/create', 'Company::create');
 $routes->match(['get', 'post'], 'calendar/create', 'Calendar::create');
 $routes->match(['get', 'post'], 'calendar/join', 'Calendar::join');
 $routes->get('calendar/(:alphanum)', 'Calendar::index/$1');
+$routes->get('calendar/(:alphanum)/month/(:num)/year/(:num)', 'Calendar::index/$1/$2/$3');
 
 /**
  * --------------------------------------------------------------------

@@ -13,9 +13,13 @@ class Calendar extends Controller
     /*
     *
     */
-    public function index($invite_code)
+    public function index($invite_code, $month=null, $year=null)
     {
         $session = session();
+        $data = [
+            'month' => intval($month),
+            'year' => intval($year),
+        ];
         if (session()->get('account_type_id') == 1) {
             $userModel = new UserModel();
             $userList['users'] = $userModel->getUserList($invite_code);
@@ -24,7 +28,7 @@ class Calendar extends Controller
             echo view('Views/templates/footer');
         } else if (session()->get('account_type_id') == 2) {
             echo view('Views/templates/header');
-            echo view('Views/calendar/calendarWorker');
+            echo view('Views/calendar/calendarWorker', $data);
             echo view('Views/templates/footer');
         }
     }
