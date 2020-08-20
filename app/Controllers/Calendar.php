@@ -26,23 +26,11 @@ class Calendar extends Controller
         ];        
         if (session()->get('account_type_id') == 1) {
             $userModel = new UserModel();
-            $userList['users'] = $userModel->getUserList($invite_code);
+            $data['users'] = $userModel->getUserList($invite_code);
             echo view('Views/templates/header');
-            echo view('Views/calendar/calendarOwner', $userList);
+            echo view('Views/calendar/calendarOwner', $data);
             echo view('Views/templates/footer');
         } else if (session()->get('account_type_id') == 2) {
-
-            if($this->request->getMethod() === 'post')
-            {
-                $daysOfLeaveModel = new DaysOfLeaveModel();
-                $daysOfLeaveModel->saveDays($invite_code, 
-                $session->get('id'), 
-                $this->request->getPost('year'), 
-                $this->request->getPost('number_of_days'));
-                echo 'test';
-            }
-            $departmentTypeModel = new DepartmentTypeModel();
-            $data['departmentTypes'] = $departmentTypeModel->getDepartmentTypes();
             echo view('Views/templates/header');
             echo view('Views/calendar/calendarWorker', $data);
             echo view('Views/templates/footer');

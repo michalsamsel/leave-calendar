@@ -14,7 +14,7 @@
 $session = session();
 
 if (esc($month) <= 0 || esc($month) >= 13 || esc($year) <= 1899 || esc($year) >= 2100) {
-    $month = date('m');
+    $month = date('n');
     $year = date('Y');
 }
 
@@ -57,6 +57,21 @@ $days = [
     6 => 'nd.',
 ];
 
+$monthNames = [
+    1 => 'Styczeń',
+    2 => 'Luty',
+    3 => 'Marzec',
+    4 => 'Kwiecień',
+    5 => 'Maj',
+    6 => 'Czerwiec',
+    7 => 'Lipiec',
+    8 => 'Sierpień',
+    9 => 'Wrzesień',
+    10 => 'Październik',
+    11 => 'Listopad',
+    12 => 'Grudzień',
+];
+
 if($month > 1){
     echo '<a href="'. route_to('App\Controllers\Calendar::index', $invite_code, $month-1, $year).'">Poprzedni miesiąc</a>';
 }
@@ -64,7 +79,7 @@ else
 {
     echo '<a href="'. route_to('App\Controllers\Calendar::index', $invite_code, 12, $year-1).'">Poprzedni miesiąc</a>';
 }
-echo ' '. $month . '-' . $year . ' ';
+echo ' '. $monthNames[$month] . ' ' . $year . ' ';
 if($month < 12){
     echo '<a href="'. route_to('App\Controllers\Calendar::index', $invite_code, $month+1, $year).'">Poprzedni miesiąc</a>';
 }
@@ -103,7 +118,7 @@ echo '<tr>';
 echo '<td>' . $session->get('first_name') . ' ' . $session->get('last_name') . '</td>';
 echo '<td>Pula</td>';
 echo '<td>Wykorzystane</td>';
-echo '<td>Pula-Wykorzystane</td>';
+echo '<td>Pula-Wykorzystane</td>';  
 
 for ($i = 0; $i < $daysInMonth; $i++) {
     $day = (date(mktime(0, 0, 0, $month, $i + 1, $year)));
@@ -117,21 +132,4 @@ for ($i = 0; $i < $daysInMonth; $i++) {
 }
 echo '</tr>';
 echo '</table>';
-
-?>
-
-
-
-
-<?php
-/*<?= \Config\Services::validation()->listErrors(); ?>
-<form action="/calendar/<?=$invite_code?>/month/<?=$month?>/year/<?=$year?>" method="post">
-    <?= csrf_field() ?>
-    <label for ="number_of_days">Podaj liczbę dni urlopowych w roku <?= $year ?></label>
-    <input type="text" name="number_of_days"> <br />
-    <input type="hidden" name="year" value=<?=$year?>>
-
-    <input type="submit" name="submit" value="Zaktualizuj pule dni"/>
-
-</form>*/
 ?>
