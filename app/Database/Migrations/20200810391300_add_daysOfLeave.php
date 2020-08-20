@@ -34,12 +34,12 @@ class addDayOfLeave extends Migration
         $this->forge->addPrimaryKey('id');
         $this->forge->addForeignKey('user_id', 'user', 'id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('calendar_id', 'calendar', 'id', 'CASCADE', 'CASCADE');
-        $this->forge->createTable('day_of_leave');
+        $this->forge->createTable('days_of_leave');
         $this->db->enableForeignKeyChecks();
     }
 
     public function down()
     {
-        $this->forge->dropDatabase('day_of_leave');
+        $this->forge->dropDatabase('days_of_leave');
     }
 }

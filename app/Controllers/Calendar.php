@@ -2,11 +2,14 @@
 
 namespace App\Controllers;
 
+use App\Database\Seeds\departmentTypeSeeder;
 use CodeIgniter\Controller;
 use App\Models\CalendarModel;
 use App\Models\CalendarUserModel;
 use App\Models\CompanyModel;
 use App\Models\UserModel;
+use App\Models\DepartmentTypeModel;
+use App\Models\DaysOfLeaveModel;
 
 class Calendar extends Controller
 {
@@ -17,9 +20,10 @@ class Calendar extends Controller
     {
         $session = session();
         $data = [
+            'invite_code' => $invite_code,
             'month' => intval($month),
             'year' => intval($year),
-        ];
+        ];        
         if (session()->get('account_type_id') == 1) {
             $userModel = new UserModel();
             $userList['users'] = $userModel->getUserList($invite_code);
@@ -27,6 +31,18 @@ class Calendar extends Controller
             echo view('Views/calendar/calendarOwner', $userList);
             echo view('Views/templates/footer');
         } else if (session()->get('account_type_id') == 2) {
+
+            if($this->request->getMethod() === 'post')
+            {
+                $daysOfLeaveModel = new DaysOfLeaveModel();
+                $daysOfLeaveModel->saveDays($invite_code, 
+                $session->get('id'), 
+                $this->request->getPost('year'), 
+                $this->request->getPost('number_of_days'));
+                echo 'test';
+            }
+            $departmentTypeModel = new DepartmentTypeModel();
+            $data['departmentTypes'] = $departmentTypeModel->getDepartmentTypes();
             echo view('Views/templates/header');
             echo view('Views/calendar/calendarWorker', $data);
             echo view('Views/templates/footer');
