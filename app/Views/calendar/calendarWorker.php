@@ -116,9 +116,9 @@ for ($i = 0; $i < $daysInMonth; $i++) {
 echo '</tr>';
 echo '<tr>';
 echo '<td>' . $session->get('first_name') . ' ' . $session->get('last_name') . '</td>';
-echo '<td>Pula</td>';
-echo '<td>Wykorzystane</td>';
-echo '<td>Pula-Wykorzystane</td>';  
+echo '<td>'.esc($numberOfDays).'</td>';
+echo '<td>0</td>';
+echo '<td>'.esc($numberOfDays).'-0</td>';  
 
 for ($i = 0; $i < $daysInMonth; $i++) {
     $day = (date(mktime(0, 0, 0, $month, $i + 1, $year)));
@@ -133,3 +133,12 @@ for ($i = 0; $i < $daysInMonth; $i++) {
 echo '</tr>';
 echo '</table>';
 ?>
+
+<?= \Config\Services::validation()->listErrors(); ?>
+<form action="<?=route_to('App\Controllers\Calendar::index', $invite_code, $month, $year)?>" method="post">
+    <?= csrf_field() ?>
+    <label for="number_of_days">Wpisz liczbe dni urlopu na rok <?= $year ?>:</label>
+    <input type="text" name="number_of_days" /> <br /><br />
+    <input type="hidden" name="year" value="<?=$year?>">
+    <input type="submit" name="submit" value="Zapisz dni" />
+</form>

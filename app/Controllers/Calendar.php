@@ -16,14 +16,26 @@ class Calendar extends Controller
     /*
     *
     */
-    public function index($invite_code, $month=null, $year=null)
+    public function index($invite_code, $month = null, $year = null)
     {
         $session = session();
-        $data = [
-            'invite_code' => $invite_code,
-            'month' => intval($month),
-            'year' => intval($year),
-        ];        
+        $daysOfLeaveModel = new DaysOfLeaveModel();
+
+        if ($month !== null && $year !== null) {
+            $data = [
+                'invite_code' => $invite_code,
+                'month' => intval($month),
+                'year' => intval($year),
+            ];
+        }
+        else
+        {
+            $data = [
+                'invite_code' => $invite_code,
+                'month' => date('n'),
+                'year' => date('Y'),
+            ];
+        }
         if (session()->get('account_type_id') == 1) {
             $userModel = new UserModel();
             $data['users'] = $userModel->getUserList($invite_code);
@@ -31,6 +43,29 @@ class Calendar extends Controller
             echo view('Views/calendar/calendarOwner', $data);
             echo view('Views/templates/footer');
         } else if (session()->get('account_type_id') == 2) {
+
+            $ruleMessages = [
+                'number_of_days' => [
+                    'greater_than_equal_to' => 'Nie można podać ujemnej ilości dni.',
+                    'min_length' => 'Pole nie może być puste',
+                ],
+            ];
+            if ($this->request->getMethod() === 'post' && $this->validate([
+                'number_of_days' => 'greater_than_equal_to[0]min_length[1]',
+            ], $ruleMessages)) {
+                $daysOfLeaveModel = new DaysOfLeaveModel();
+
+                $daysOfLeaveModel->saveDays(
+                    $invite_code,
+                    $session->get('id'),
+                    $this->request->getPost('year'),
+                    $this->request->getPost('number_of_days')
+                );
+            }
+
+            $userDaysOfLeave = $daysOfLeaveModel->getUserDays($session->get('id'), $data['invite_code'], $data['year']);
+            $data['numberOfDays'] = $userDaysOfLeave['number_of_days'];
+
             echo view('Views/templates/header');
             echo view('Views/calendar/calendarWorker', $data);
             echo view('Views/templates/footer');
