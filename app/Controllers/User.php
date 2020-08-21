@@ -66,7 +66,7 @@ class User extends Controller
             'email' => [
                 'valid_email' => 'To nie jest poprawny adres email.',
                 'max_length' => 'W polu Email jest zbyt dużo znaków (maksymalnie 100 znaków).',
-                'isEmailUsed' => 'Podany email jest już wykorzystany.',
+                'isEmailFreeToUse' => 'Podany email jest już wykorzystany.',
             ],
             'password' => [
                 'min_length' => 'Podane hasło jest zbyt krótkie (minimum 6 znaków).',
@@ -82,7 +82,7 @@ class User extends Controller
             'account_type_id' => 'in_list[1,2]',
             'first_name' => 'alpha|min_length[3]|max_length[100]',
             'last_name' => 'alpha_dash|min_length[3]|max_length[100]',
-            'email' => 'valid_email|max_length[100]|isEmailUsed',
+            'email' => 'valid_email|max_length[100]|isEmailFreeToUse',
             'password' => 'min_length[6]|max_length[16]',
             'password_validate' => 'matches[password]',
         ], $ruleMessages)) {
