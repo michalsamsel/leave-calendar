@@ -22,35 +22,6 @@ if (esc($month) <= 0 || esc($month) >= 13 || esc($year) <= 1899 || esc($year) >=
     $year = date('Y');
 }
 
-$nationalDays = [
-    0 => date(mktime(0, 0, 0, 1, 1, $year)),
-    1 => date(mktime(0, 0, 0, 1, 6, $year)),
-    2 => date(mktime(0, 0, 0, 5, 1, $year)),
-    3 => date(mktime(0, 0, 0, 5, 3, $year)),
-    4 => date(mktime(0, 0, 0, 8, 15, $year)),
-    5 => date(mktime(0, 0, 0, 11, 1, $year)),
-    6 => date(mktime(0, 0, 0, 11, 11, $year)),
-    7 => date(mktime(0, 0, 0, 12, 25, $year)),
-    8 => date(mktime(0, 0, 0, 12, 26, $year)),
-];
-
-$yearMod19 = $year % 19;
-$yearMod4 = $year % 4;
-$yearMod7 = $year % 7;
-$easterHelpA = (19 * $yearMod19 + 24) % 30;
-$easterHelpB = ((2 * $yearMod4) + (4 * $yearMod7) + (6 * $easterHelpA) + 5) % 7;
-$easterDay = 22 + $easterHelpA + $easterHelpB;
-
-if ($easterDay <= 31) {
-    $nationalDays[9] = date(mktime(0, 0, 0, 3, $easterDay, $year));
-} else {
-    $easterDay = $easterHelpA + $easterHelpB - 9;
-    $nationalDays[9] = date(mktime(0, 0, 0, 4, $easterDay, $year));
-}
-
-$nationalDays[10] = strtotime("1 day", $nationalDays[9]);
-$nationalDays[11] = strtotime("60 days", $nationalDays[9]);
-
 $days = [
     0 => 'pn.',
     1 => 'wt.',
@@ -148,11 +119,14 @@ foreach($users as $user)
         echo '</td>';
     }
     echo '<td>';
-    echo '<input type="hidden" name="user_id[]" value="'.$user['id'].'">';
-    echo '<input type="date" name="from[]">';
+    echo '<input type="hidden" name="leaves['.$user['id'].'][user_id]" value="'.$user['id'].'">';
+    echo '<input type="date" name="leaves['.$user['id'].'][from]">';
     echo '</td>';
     echo '<td>';
-    echo '<input type="date" name="to[]">';
+    echo '<input type="date" name="leaves['.$user['id'].'][to]">';
+    echo '<input type="hidden" name="leaves['.$user['id'].'][working_days_used]" value="0">';
+    echo '<input type="hidden" name="leaves['.$user['id'].'][leave_type_id]" value="1">';
+    echo '<input type="hidden" name="leaves['.$user['id'].'][calendar_id]" value="'.$invite_code.'">';
     echo '</td>';
     echo '</tr>';
 }

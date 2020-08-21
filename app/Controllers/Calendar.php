@@ -10,6 +10,7 @@ use App\Models\CompanyModel;
 use App\Models\UserModel;
 use App\Models\DepartmentTypeModel;
 use App\Models\DaysOfLeaveModel;
+use App\Models\LeaveModel;
 
 class Calendar extends Controller
 {
@@ -27,25 +28,92 @@ class Calendar extends Controller
                 'month' => intval($month),
                 'year' => intval($year),
             ];
-        }
-        else
-        {
+        } else {
             $data = [
                 'invite_code' => $invite_code,
                 'month' => date('n'),
                 'year' => date('Y'),
             ];
         }
+
+        $nationalDays = [
+            0 => date(mktime(0, 0, 0, 1, 1, $year)),
+            1 => date(mktime(0, 0, 0, 1, 6, $year)),
+            2 => date(mktime(0, 0, 0, 5, 1, $year)),
+            3 => date(mktime(0, 0, 0, 5, 3, $year)),
+            4 => date(mktime(0, 0, 0, 8, 15, $year)),
+            5 => date(mktime(0, 0, 0, 11, 1, $year)),
+            6 => date(mktime(0, 0, 0, 11, 11, $year)),
+            7 => date(mktime(0, 0, 0, 12, 25, $year)),
+            8 => date(mktime(0, 0, 0, 12, 26, $year)),
+        ];
+
+        $yearMod19 = $year % 19;
+        $yearMod4 = $year % 4;
+        $yearMod7 = $year % 7;
+        $easterHelpA = (19 * $yearMod19 + 24) % 30;
+        $easterHelpB = ((2 * $yearMod4) + (4 * $yearMod7) + (6 * $easterHelpA) + 5) % 7;
+        $easterDay = 22 + $easterHelpA + $easterHelpB;
+
+        if ($easterDay <= 31) {
+            $nationalDays[9] = date(mktime(0, 0, 0, 3, $easterDay, $year));
+        } else {
+            $easterDay = $easterHelpA + $easterHelpB - 9;
+            $nationalDays[9] = date(mktime(0, 0, 0, 4, $easterDay, $year));
+        }
+
+        $nationalDays[10] = strtotime("1 day", $nationalDays[9]);
+        $nationalDays[11] = strtotime("60 days", $nationalDays[9]);
+
+        $data['nationalDays'] = $nationalDays;
+
         if (session()->get('account_type_id') == 1) {
             $userModel = new UserModel();
             $data['users'] = $userModel->getUserList($invite_code);
             $data['daysOfLeave'] = $daysOfLeaveModel->getAllUsersDays($data['invite_code'], $data['year']);
 
-            if($this->request->getMethod() === 'post' && $this->validate([
+            if ($this->request->getMethod() === 'post') {
+                $leaves = $this->request->getPost('leaves');
+                foreach ($leaves as $leave) {
+                    if (empty($leave['from']) && empty($leave['to'])) {
+                        unset($leaves[$leave['user_id']]);
+                        continue;
+                    }
+                    if (empty($leave['from'])) {
+                        $leave['from'] = $leave['to'];
+                    } else if (empty($leave['to'])) {
+                        $leave['to'] = $leave['from'];
+                    }
 
-            ]))
-            {
+                    $days = 0;
+                    for ($i = $leave['from']; $i <= $leave['to']; $i++) {
+                        $seperateDate = explode("-", $i);
+
+                        $temporaryDate = date('w', mktime(0, 0, 0, $seperateDate[1], $seperateDate[2] - 1, $seperateDate[0]));
+                        $temporaryDate2 = date(mktime(0, 0, 0, $seperateDate[1], $seperateDate[2], $seperateDate[0]));
+                        //if ($temporaryDate < 5 || (! in_array($temporaryDate2, $nationalDays))) {
+                        if ($temporaryDate >= 5 || in_array($temporaryDate2, $nationalDays)) {
+                        }
+                        else{                            
+                            $days++;
+                        }
+                    }
+                    if($days === 0)
+                    {
+                        unset($leaves[$leave['user_id']]);
+                        continue;
+                    }
+                    $calendarModel = new CalendarModel();
+                    $calendar_id = $calendarModel->getCalendarId($data['invite_code']);
+                    $leave['calendar_id'] = $calendar_id['id'];
+                    $leave['working_days_used'] = $days;
+                    $leaves[$leave['user_id']] = $leave;
+                    $leaveModel = new LeaveModel();
+                    $leaveModel->addLeave($leave);
+                }
+                $data['test'] = $leaves;
                 
+                //$leaveModel->addLeave($leaves);                
             }
 
             echo view('Views/templates/header');
@@ -61,7 +129,7 @@ class Calendar extends Controller
             ];
             if ($this->request->getMethod() === 'post' && $this->validate([
                 'number_of_days' => 'greater_than_equal_to[0]min_length[1]',
-            ], $ruleMessages)) {               
+            ], $ruleMessages)) {
                 $daysOfLeaveModel->saveDays(
                     $invite_code,
                     $session->get('id'),
@@ -70,12 +138,10 @@ class Calendar extends Controller
                 );
             }
 
-            $userDaysOfLeave = $daysOfLeaveModel->getUserDays($session->get('id'), $data['invite_code'], $data['year']);            
-            if(empty($userDaysOfLeave['number_of_days']))
-            {
+            $userDaysOfLeave = $daysOfLeaveModel->getUserDays($session->get('id'), $data['invite_code'], $data['year']);
+            if (empty($userDaysOfLeave['number_of_days'])) {
                 $data['numberOfDays'] = 0;
-            }
-            else{
+            } else {
                 $data['numberOfDays'] = $userDaysOfLeave['number_of_days'];
             }
 
