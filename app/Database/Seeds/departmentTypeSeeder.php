@@ -4,6 +4,10 @@ namespace App\Database\Seeds;
 
 class departmentTypeSeeder extends \CodeIgniter\Database\Seeder
 {
+    /*
+    * This seed keeps starting values of departments in companies.
+    * This list can be different and for now it isnt required to seed it into database.
+    */
     public function run()
     {
         $departments = [
@@ -24,8 +28,6 @@ class departmentTypeSeeder extends \CodeIgniter\Database\Seeder
             ],
         ];
 
-        foreach ($departments as $department) {
-            $this->db->table('department_type')->insert($department);
-        }
+        $this->db->table('department_type')->insertBatch($departments);
     }
 }
