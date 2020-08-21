@@ -6,7 +6,12 @@ use CodeIgniter\Database\Migration;
 
 class addDepartmentType extends Migration
 {
-    // This dictionary table should keep different values of departments in companies.
+    /*
+    * This dictionary table keeps information about diffrent departments in companies.
+    * If working user is connected with calendar he should be able to  choose in which department he works.
+    * If there's no department in which user works. He should be able to add it on it's own.
+    * Usage of this table is not implemented yet.
+    */
     public function up()
     {
         $this->forge->addField([
@@ -23,6 +28,7 @@ class addDepartmentType extends Migration
         ]);
 
         $this->forge->addPrimaryKey('id');
+
         $this->forge->createTable('department_type');
     }
 

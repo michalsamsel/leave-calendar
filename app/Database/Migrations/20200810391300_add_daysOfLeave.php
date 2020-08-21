@@ -6,10 +6,17 @@ use CodeIgniter\Database\Migration;
 
 class addDayOfLeave extends Migration
 {
-    // This table saves information how mouch in specific year users have days of leave to use.
+    /*
+    * This table keeps information about how much per year users have days of leave to use in specific calendar.
+    * Worker can change that value in calendar view.
+    * There is no default value beacuse number of days can be diffrent for each users.
+    * Id calendar or user is deleted the data connected to them should also be delete by CASCADE.
+        But deleting function is not implemented yet.
+    */
     public function up()
     {
         $this->db->disableForeignKeyChecks();
+
         $this->forge->addField([
             'calendar_id' => [
                 'type' => 'INT',
@@ -32,9 +39,12 @@ class addDayOfLeave extends Migration
         ]);
 
         $this->forge->addPrimaryKey('id');
+
         $this->forge->addForeignKey('user_id', 'user', 'id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('calendar_id', 'calendar', 'id', 'CASCADE', 'CASCADE');
+
         $this->forge->createTable('days_of_leave');
+
         $this->db->enableForeignKeyChecks();
     }
 

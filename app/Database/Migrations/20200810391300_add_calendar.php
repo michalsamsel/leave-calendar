@@ -6,10 +6,18 @@ use CodeIgniter\Database\Migration;
 
 class addCalendar extends Migration
 {
-    // This table saves information about existing calendars.
+    /*
+    * This table keeps information about existing calendars.
+    * Each calendar is connected with supervisor account and single company.
+        This connection is made for easier generating Leave Application Form PDF.
+    * Invite code lets join worker users to calendars.
+    * If company or creator of calendar delete his account the calendar should also be deleted by CASCADE.
+        But deleting function is not implemented yet.
+    */
     public function up()
     {
         $this->db->disableForeignKeyChecks();
+
         $this->forge->addField([
             'id' => [
                 'type' => 'INT',
@@ -37,9 +45,12 @@ class addCalendar extends Migration
         ]);
 
         $this->forge->addPrimaryKey('id');
+
         $this->forge->addForeignKey('owner_id', 'user', 'id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('company_id', 'company', 'id', 'CASCADE', 'CASCADE');
+
         $this->forge->createTable('calendar');
+
         $this->db->enableForeignKeyChecks();
     }
 

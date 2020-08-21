@@ -6,10 +6,16 @@ use CodeIgniter\Database\Migration;
 
 class addUser extends Migration
 {
-    // This table keeps information about users and their data required to log in.
+    /*
+    * This table keeps information about all users.
+    * Users can create account with one out of two diffrent previlages. Account types are: worker and supervisor.
+    * If user wants to use account with diffrent previlages he needs to create a new account.
+    * Users log in using email and password.
+    */
     public function up()
     {
         $this->db->disableForeignKeyChecks();
+
         $this->forge->addField([
             'id' => [
                 'type' => 'INT',
@@ -41,8 +47,11 @@ class addUser extends Migration
         ]);
 
         $this->forge->addPrimaryKey('id');
+
         $this->forge->addForeignKey('account_type_id', 'account_type', 'id');
+
         $this->forge->createTable('user');
+
         $this->db->enableForeignKeyChecks();
     }
 

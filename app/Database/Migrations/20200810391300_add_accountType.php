@@ -6,7 +6,10 @@ use CodeIgniter\Database\Migration;
 
 class addAccountType extends Migration
 {
-    // This dictionary table should keep two different values of accounts users can create.
+    /*
+    * This dictionary table keeps information about diffrent types of accounts in database.
+    * Basic version of calendar keeps only worker and supervisor account type.
+    */
     public function up()
     {
         $this->forge->addField([
@@ -23,6 +26,7 @@ class addAccountType extends Migration
         ]);
 
         $this->forge->addPrimaryKey('id');
+
         $this->forge->createTable('account_type');
     }
 

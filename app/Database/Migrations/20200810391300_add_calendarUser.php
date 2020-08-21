@@ -6,10 +6,18 @@ use CodeIgniter\Database\Migration;
 
 class addCalendarUser extends Migration
 {
-    // This table saves information about users who joined calendars and users role in company.
+    /*
+    * When user joins calendar this table keeps information about which user joined which calendar.
+    * This table also can keeps information about in which company and in what department user works.
+        But it's not implemented yet.
+        It should be just a cosmetic information for supervisor.
+    * If calendar or user is deleted the row connecting them should also be deleted by CASCADE.
+        But deleting function is not implemented yet.
+    */
     public function up()
     {
         $this->db->disableForeignKeyChecks();
+
         $this->forge->addField([
             'calendar_id' => [
                 'type' => 'INT',
@@ -27,10 +35,13 @@ class addCalendarUser extends Migration
         ]);
 
         $this->forge->addPrimaryKey('id');
+
         $this->forge->addForeignKey('calendar_id', 'calendar', 'id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('user_id', 'user', 'id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('user_department_id', 'department_type', 'id');
+
         $this->forge->createTable('calendar_user');
+
         $this->db->enableForeignKeyChecks();
     }
 
