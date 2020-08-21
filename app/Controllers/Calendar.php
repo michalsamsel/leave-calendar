@@ -39,6 +39,15 @@ class Calendar extends Controller
         if (session()->get('account_type_id') == 1) {
             $userModel = new UserModel();
             $data['users'] = $userModel->getUserList($invite_code);
+            $data['daysOfLeave'] = $daysOfLeaveModel->getAllUsersDays($data['invite_code'], $data['year']);
+
+            if($this->request->getMethod() === 'post' && $this->validate([
+
+            ]))
+            {
+                
+            }
+
             echo view('Views/templates/header');
             echo view('Views/calendar/calendarOwner', $data);
             echo view('Views/templates/footer');
@@ -52,9 +61,7 @@ class Calendar extends Controller
             ];
             if ($this->request->getMethod() === 'post' && $this->validate([
                 'number_of_days' => 'greater_than_equal_to[0]min_length[1]',
-            ], $ruleMessages)) {
-                $daysOfLeaveModel = new DaysOfLeaveModel();
-
+            ], $ruleMessages)) {               
                 $daysOfLeaveModel->saveDays(
                     $invite_code,
                     $session->get('id'),
@@ -63,8 +70,14 @@ class Calendar extends Controller
                 );
             }
 
-            $userDaysOfLeave = $daysOfLeaveModel->getUserDays($session->get('id'), $data['invite_code'], $data['year']);
-            $data['numberOfDays'] = $userDaysOfLeave['number_of_days'];
+            $userDaysOfLeave = $daysOfLeaveModel->getUserDays($session->get('id'), $data['invite_code'], $data['year']);            
+            if(empty($userDaysOfLeave['number_of_days']))
+            {
+                $data['numberOfDays'] = 0;
+            }
+            else{
+                $data['numberOfDays'] = $userDaysOfLeave['number_of_days'];
+            }
 
             echo view('Views/templates/header');
             echo view('Views/calendar/calendarWorker', $data);

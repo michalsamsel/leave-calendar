@@ -134,6 +134,7 @@ echo '</tr>';
 echo '</table>';
 ?>
 
+<br />
 <?= \Config\Services::validation()->listErrors(); ?>
 <form action="<?=route_to('App\Controllers\Calendar::index', $invite_code, $month, $year)?>" method="post">
     <?= csrf_field() ?>

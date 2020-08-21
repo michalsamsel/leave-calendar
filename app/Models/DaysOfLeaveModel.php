@@ -63,4 +63,20 @@ class DaysOfLeaveModel extends Model
         ->select('number_of_days')
         ->first();
     }
+
+    public function getAllUsersDays($invite_code, $year)
+    {
+        $calendarModel = new CalendarModel();
+        $calendar_id = $calendarModel->getCalendarId($invite_code);
+
+        $data = [
+            'calendar_id' => $calendar_id,
+            'year' => $year,
+        ];
+
+        return $this->asArray()
+        ->where($data)
+        ->select(['user_id', 'number_of_days'])
+        ->findAll();
+    }
 }

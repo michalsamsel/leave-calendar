@@ -10,6 +10,10 @@
     }
 </style>
 
+<?= \Config\Services::validation()->listErrors(); ?>
+<form action="<?=route_to('App\Controllers\Calendar::index', $invite_code, $month, $year)?>" method="post">
+    <?= csrf_field() ?>
+
 <?php
 $session = session();
 
@@ -99,7 +103,8 @@ for ($i = 0; $i < $daysInMonth; $i++) {
     echo $i + 1;
     echo '</td>';
 }
-
+echo '<td rowspan=2>Urlop od:</td>';
+echo '<td rowspan=2>Urlop do:</td>';
 echo '</tr>';
 echo '<tr>';
 echo '<th>Imię i nazwisko</th>';
@@ -119,7 +124,16 @@ foreach($users as $user)
 {
     echo '<tr>';
     echo '<td>' . $user['first_name'] . ' ' . $user['last_name'] . '</td>';
-    echo '<td>Pula</td>';
+    echo '<td>';
+    $days = 0;
+    for($i=0; $i<count($daysOfLeave); $i++){
+        if($daysOfLeave[$i]['user_id'] == $user['id'])
+        {
+            $days = $daysOfLeave[$i]['number_of_days'];
+        }
+    }
+    echo $days;
+    echo '</td>';
     echo '<td>Wykorzystane</td>';
     echo '<td>Pula-Wykorzystane</td>';
     
@@ -133,8 +147,17 @@ foreach($users as $user)
         }
         echo '</td>';
     }
+    echo '<td>';
+    echo '<input type="hidden" name="user_id[]" value="'.$user['id'].'">';
+    echo '<input type="date" name="from[]">';
+    echo '</td>';
+    echo '<td>';
+    echo '<input type="date" name="to[]">';
+    echo '</td>';
     echo '</tr>';
 }
 
 echo '</table>';
 ?>
+<input type="submit" name="submit" value="Zapisz urlopy" />
+</form>

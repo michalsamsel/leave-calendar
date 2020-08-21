@@ -82,6 +82,6 @@ class UserModel extends Model
 
         $calendarId = $calendarModel->getCalendarId($invite_code);
 
-        return $this->query('SELECT u.first_name, u.last_name FROM user AS u, calendar_user AS cu WHERE cu.calendar_id=' . $calendarId['id'] . ' AND cu.user_id=u.id ORDER BY u.last_name, u.first_name;')->getResultArray();
+        return $this->query('SELECT u.id, u.first_name, u.last_name FROM user AS u, calendar_user AS cu WHERE cu.calendar_id=' . $calendarId['id'] . ' AND cu.user_id=u.id ORDER BY u.last_name, u.first_name;')->getResultArray();
     }
 }
