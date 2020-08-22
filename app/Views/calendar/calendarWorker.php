@@ -52,11 +52,11 @@ else
 }
 echo ' '. $monthNames[$month] . ' ' . $year . ' ';
 if($month < 12){
-    echo '<a href="'. route_to('App\Controllers\Calendar::index', $invite_code, $month+1, $year).'">Poprzedni miesiąc</a>';
+    echo '<a href="'. route_to('App\Controllers\Calendar::index', $invite_code, $month+1, $year).'">Następny miesiąc</a>';
 }
 else
 {
-    echo '<a href="'. route_to('App\Controllers\Calendar::index', $invite_code, 1, $year+1).'">Poprzedni miesiąc</a>';
+    echo '<a href="'. route_to('App\Controllers\Calendar::index', $invite_code, 1, $year+1).'">Następny miesiąc</a>';
 }
 
 echo '<table id="calendar">';
@@ -88,8 +88,8 @@ echo '</tr>';
 echo '<tr>';
 echo '<td>' . $session->get('first_name') . ' ' . $session->get('last_name') . '</td>';
 echo '<td>'.esc($numberOfDays).'</td>';
-echo '<td>0</td>';
-echo '<td>'.esc($numberOfDays).'-0</td>';  
+echo '<td>'.esc($userWorkingDaysUsed['working_days_used']).'</td>';
+echo '<td>'. (esc($numberOfDays) - esc($userWorkingDaysUsed['working_days_used'])).'</td>';
 
 for ($i = 0; $i < $daysInMonth; $i++) {
     $day = (date(mktime(0, 0, 0, $month, $i + 1, $year)));

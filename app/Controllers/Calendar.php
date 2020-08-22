@@ -80,7 +80,7 @@ class Calendar extends Controller
 
         $data['publicHolidays'] = $publicHolidays;
 
-
+        $leaveModel = new LeaveModel();
         $daysOfLeaveModel = new DaysOfLeaveModel();
 
         if (session()->get('account_type_id') == 1) {
@@ -105,6 +105,14 @@ class Calendar extends Controller
                         $leave['from'] = $leave['to'];
                     } else if (empty($leave['to'])) {
                         $leave['to'] = $leave['from'];
+                    }
+                    
+                    //If someone swaps first day and last day of leave, replace their values.
+                    if($leave['from'] > $leave['to'])
+                    {
+                        $temporaryDate = $leave['from'];
+                        $leave['from'] = $leave['to'];
+                        $leave['to'] = $temporaryDate;
                     }
 
                     //Count number of working days. Skip weekends and country holidays.
@@ -163,12 +171,20 @@ class Calendar extends Controller
                 );
             }
 
-            //Get number of days user have and display them in 'pula' field.
+            //Get number of days user have at all and display them in 'pula' field.
             $userDaysOfLeave = $daysOfLeaveModel->getNumberOfDays(
                 $session->get('id'),
                 $data['invite_code'],
                 $data['year']
             );
+
+            //Get number of days which user used for leaves and display them in 'wykorzystane' field. 
+            $userWorkingDaysUsed = $leaveModel->countUserDays(
+                $session->get('id'),
+                $calendarId['id'],
+                $data['year']
+            );
+            $data['userWorkingDaysUsed'] = $userWorkingDaysUsed;
 
             //If number of days wasnt updated yet, set them as 0 days.
             if (empty($userDaysOfLeave['number_of_days'])) {

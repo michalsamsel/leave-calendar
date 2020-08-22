@@ -16,7 +16,7 @@ class Company extends Controller
         $session = session();
 
         //If someone with other then supervisor account tries to open form, redirect him to main page.
-        if($session->get('account_type_id') !== 1)
+        if($session->get('account_type_id') != 1)
         {
             return redirect('/');
         }
