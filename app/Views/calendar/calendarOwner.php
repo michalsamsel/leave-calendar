@@ -120,10 +120,10 @@ foreach(esc($userList) as $user)
     }
     echo '<td>';
     echo '<input type="hidden" name="leaveList['.$user['id'].'][user_id]" value="'.$user['id'].'">';
-    echo '<input type="date" name="leaveList['.$user['id'].'][from]">';
+    echo '<input type="date" name="leaveList['.$user['id'].'][from]" min="'.$year.'-01-01" max="'.$year.'-12-31">';
     echo '</td>';
     echo '<td>';
-    echo '<input type="date" name="leaveList['.$user['id'].'][to]">';
+    echo '<input type="date" name="leaveList['.$user['id'].'][to]" min="'.$year.'-01-01" max="'.$year.'-12-31">';
     echo '<input type="hidden" name="leaveList['.$user['id'].'][working_days_used]" value="0">';
     echo '<input type="hidden" name="leaveList['.$user['id'].'][leave_type_id]" value="1">';
     echo '<input type="hidden" name="leaveList['.$user['id'].'][calendar_id]" value="'.$invite_code.'">';
