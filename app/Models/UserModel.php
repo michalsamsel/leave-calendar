@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
-use App\Models\CalendarUserModel;
+use App\Models\CalendarModel;
 
 class UserModel extends Model
 {
