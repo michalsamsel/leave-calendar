@@ -25,7 +25,7 @@ class CalendarUserModel extends Model
             'calendar_id' => $calendarId['id'],
         ];
 
-        if (!$this->isUserAlreadyInvited($data['user_id'], $data['calendar_id'])) {
+        if (!$this->isUserMemberOfCalendar($data['user_id'], $data['calendar_id'])) {
             return $this->save($data);
         }
     }
@@ -33,7 +33,7 @@ class CalendarUserModel extends Model
     /*
     * This method checks and returns information if user joined specific calendar.
     */
-    protected function isUserAlreadyInvited(int $userId, int $calendarId): bool
+    public function isUserMemberOfCalendar(int $userId, int $calendarId): bool
     {
         if ($this->asArray()
             ->where(['user_id' => $userId, 'calendar_id' => $calendarId])

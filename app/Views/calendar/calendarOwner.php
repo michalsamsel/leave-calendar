@@ -91,16 +91,16 @@ for ($i = 0; $i < $daysInMonth; $i++) {
 }
 echo '</tr>';
 
-foreach($users as $user)
+foreach(esc($userList) as $user)
 {
     echo '<tr>';
     echo '<td>' . $user['first_name'] . ' ' . $user['last_name'] . '</td>';
     echo '<td>';
     $days = 0;
-    for($i=0; $i<count($daysOfLeave); $i++){
-        if($daysOfLeave[$i]['user_id'] == $user['id'])
+    for($i=0; $i<count($numberOfDaysToLeave); $i++){
+        if($numberOfDaysToLeave[$i]['user_id'] == $user['id'])
         {
-            $days = $daysOfLeave[$i]['number_of_days'];
+            $days = $numberOfDaysToLeave[$i]['number_of_days'];
         }
     }
     echo $days;
@@ -113,20 +113,20 @@ foreach($users as $user)
         $dayOfWeek = date('w', mktime(0, 0, 0, $month, $i, $year));
     
         echo '<td>';
-        if ($dayOfWeek >= 5 || in_array($day, $nationalDays)) {
+        if ($dayOfWeek >= 5 || in_array($day, $publicHolidays)) {
             echo 'X';
         }
         echo '</td>';
     }
     echo '<td>';
-    echo '<input type="hidden" name="leaves['.$user['id'].'][user_id]" value="'.$user['id'].'">';
-    echo '<input type="date" name="leaves['.$user['id'].'][from]">';
+    echo '<input type="hidden" name="leaveList['.$user['id'].'][user_id]" value="'.$user['id'].'">';
+    echo '<input type="date" name="leaveList['.$user['id'].'][from]">';
     echo '</td>';
     echo '<td>';
-    echo '<input type="date" name="leaves['.$user['id'].'][to]">';
-    echo '<input type="hidden" name="leaves['.$user['id'].'][working_days_used]" value="0">';
-    echo '<input type="hidden" name="leaves['.$user['id'].'][leave_type_id]" value="1">';
-    echo '<input type="hidden" name="leaves['.$user['id'].'][calendar_id]" value="'.$invite_code.'">';
+    echo '<input type="date" name="leaveList['.$user['id'].'][to]">';
+    echo '<input type="hidden" name="leaveList['.$user['id'].'][working_days_used]" value="0">';
+    echo '<input type="hidden" name="leaveList['.$user['id'].'][leave_type_id]" value="1">';
+    echo '<input type="hidden" name="leaveList['.$user['id'].'][calendar_id]" value="'.$invite_code.'">';
     echo '</td>';
     echo '</tr>';
 }

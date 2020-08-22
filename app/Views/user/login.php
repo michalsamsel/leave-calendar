@@ -1,3 +1,5 @@
+<h3><?= esc($errorMessage) ?></h3>
+
 <?= \Config\Services::validation()->listErrors(); ?>
 
 <form action="/user/login" method="get">

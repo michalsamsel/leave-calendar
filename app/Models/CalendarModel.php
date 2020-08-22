@@ -78,4 +78,12 @@ class CalendarModel extends Model
             ->where(['invite_code' => $invite_code])
             ->first();
     }
+
+    public function getOwnerId(string $invite_code): array
+    {
+        return $this->asArray()
+        ->select('owner_id')
+        ->where(['invite_code' => $invite_code])
+        ->first();
+    }
 }

@@ -59,7 +59,7 @@ class DaysOfLeaveModel extends Model
     * This method gets number of days for one user for given calendar and year.
     * Later this information is displayed in calendar for worker view.
     */
-    public function getNumberOfDays(int $userId, string $inviteCode, int $year): array
+    public function getNumberOfDays(int $userId, string $inviteCode, int $year)
     {
         $calendarModel = new CalendarModel();
         $calendarId = $calendarModel->getId($inviteCode);

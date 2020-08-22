@@ -19,9 +19,9 @@
 
     <label for="account_type_id">Typ konta:</label> <br />
 
-    <?php foreach (esc($accounts) as $account) : ?>
-    <label for="<?= esc($account['id'])?>"> <?= esc($account['name']) ?> </label>
-    <input type="radio" value="<?= esc($account['id'])?>" name="account_type_id"/> <br />
+    <?php foreach (esc($accountTypes) as $accountType) : ?>
+    <label for="<?= esc($accountType['id'])?>"> <?= esc($accountType['name']) ?> </label>
+    <input type="radio" value="<?= esc($accountType['id'])?>" name="account_type_id"/> <br />
     <?php endforeach ?>
 
     <input type="submit" name="submit" value="Zarejestruj się" />

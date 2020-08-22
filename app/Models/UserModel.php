@@ -31,7 +31,7 @@ class UserModel extends Model
     * This method is used for validation.
     * Each email in database should be unique.
     */
-    public function getEmail(string $email): array
+    public function getEmail(string $email)
     {
         return $this->asArray()
             ->select('email')
@@ -43,7 +43,7 @@ class UserModel extends Model
     * This method gets hashed password to account.
         Later this password can be compared with not hashed given during login.
     */
-    public function getPassword(string $email): array
+    public function getPassword(string $email)
     {
         return $this->asArray()
             ->select('password')

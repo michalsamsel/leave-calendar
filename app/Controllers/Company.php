@@ -8,36 +8,46 @@ use App\Models\CompanyModel;
 class Company extends Controller
 {
     /*
-    * This method creates new company on user demand.
+    * This controller creates a new company on user demand.
     * User passes information about companies in given html form.
     */
     public function create()
     {
-        //Messages for failed validation.
-        $ruleMessages = [
+        $session = session();
+
+        //If someone with other then supervisor account tries to open form, redirect him to main page.
+        if($session->get('account_type_id') !== 1)
+        {
+            return redirect('/');
+        }
+
+        $companyModel = new CompanyModel();
+
+        $validationErrorMessage = [
             'name' => [
-                'min_length' => 'W polu Nazwa firmy jest zbyt mało znaków (minimum 1 znak).',
-                'max_length' => 'W polu Nazwa firmy jest zbyt dużo znaków (maksymalnie 255 znaków).',
+                'required' => 'Pole Nazwa firmy nie może być puste.',
+                'min_length' => 'Pole Nazwa firmy musi zawierać minimalnie 1 litere.',
+                'max_length' => 'Pole Nazwa firmy może zawierać maksymalnie 255 liter.',
             ],
             'nip' => [
-                'min_length' => 'Zbyt mało cyfr w polu NIP. (Wymagane 10 cyfr).',
-                'max_length' => 'Zbyt dużo cyfr w polu NIP. (Wymagane 10 cyfr).',
-                'numeric' => 'Usuń z pola NIP znaki które nie są cyframi.'
+                'required' => 'Pole NIP nie może być puste',
+                'min_length' => 'Pole NIP jest zbyt krótkie, musi składać się z 10 znaków.',
+                'max_length' => 'Pole NIP jest zbyt długue, musi składać się z 10 znaków.',
+                'numeric' => 'W polu NIP mogą znajdywać się jedynie cyfry',
             ],
             'city' => [
-                'min_length' => 'W polu Miasto jest zbyt mało znaków (minimum 1 znak).',
-                'max_length' => 'W polu Miasto jest zbyt dużo znaków (maksymalnie 255 znaków).',
+                'required' => 'Pole Miasto nie może być puste',
+                'min_length' => 'Pole Miasto musi zawierać minimalnie 1 litere.',
+                'max_length' => 'Pole Miasto może zawierać maksymalnie 255 liter.',
             ],
         ];
 
-        //Check if validation was successful.
         if ($this->request->getMethod() === 'post' && $this->validate([
-            'name' => 'min_length[1]|max_length[255]',
-            'nip' => 'min_length[10]|max_length[10]|numeric',
-            'city' => 'min_length[1]|max_length[255]',
-        ], $ruleMessages)) {
-            $session = session();
-            $companyModel = new CompanyModel();
+            'name' => 'required|min_length[1]|max_length[255]',
+            'nip' => 'required|min_length[10]|max_length[10]|numeric',
+            'city' => 'required|min_length[1]|max_length[255]',
+        ], $validationErrorMessage)) {
+
             //Add new company to database.
             $companyModel->createCompany(
                 $session->get('id'),
@@ -45,6 +55,7 @@ class Company extends Controller
                 $this->request->getPost('nip'),
                 $this->request->getPost('city')
             );
+
             //After successful creating of calendar redirect user to his main page.
             return redirect('user');
         } else {

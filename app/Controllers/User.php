@@ -11,73 +11,77 @@ use App\Models\CalendarUserModel;
 class User extends Controller
 {
     /*
-    * This method shows pages for logged users based on their account type.
+    * This controller loads pages based on type of account.
+        Supervisor and worker have diffrent functions so they have diffrent views.
     */
     public function index()
     {
         $session = session();
 
-        if ($session->get('id') !== null) {
-            //Load page for user with account type of 'company owner'.
-            if ($session->get('account_type_id') == 1) {
-                $calendarModel = new CalendarModel();
-                $calendarList['calendars'] = $calendarModel->getCalendarList($session->get('id'));
-                echo view('Views/templates/header');
-                echo view('Views/user/companyOwner', $calendarList);
-                echo view('Views/templates/footer');
-            }
-            //Load page for user with account type of 'company worker'.
-            else if ($session->get('account_type_id') == 2) {
-                $calendarUserModel = new CalendarUserModel();
-                $calendarUserList['calendars'] = $calendarUserModel->getCalendarList($session->get('id'));
-                echo view('Views/templates/header');
-                echo view('Views/user/companyWorker', $calendarUserList);
-                echo view('Views/templates/footer');
-            } else {
-                //Other account types shouldnt exist so redirect them to main website.
-                return redirect('/');
-            }
+        //If user was not logged in or his session ended redirect him to login website.
+        if ($session->get('id') == null) {
+            return redirect('user/login');
+        }
+
+        //Load page for supervisor.
+        if ($session->get('account_type_id') == 1) {
+
+            $calendarModel = new CalendarModel();
+            $calendarList['calendarList'] = $calendarModel->getCalendarList($session->get('id'));
+
+            echo view('Views/templates/header');
+            echo view('Views/user/companyOwner', $calendarList);
+            echo view('Views/templates/footer');
+        }
+        //Load page for worker.
+        else if ($session->get('account_type_id') == 2) {
+            $calendarUserModel = new CalendarUserModel();
+            $calendarList['calendarList'] = $calendarUserModel->getCalendarList($session->get('id'));
+
+            echo view('Views/templates/header');
+            echo view('Views/user/companyWorker', $calendarList);
+            echo view('Views/templates/footer');
         } else {
-            //If user isnt loged in redirect him to main website.
-            return redirect('/');
+            //Other account types shouldnt exist so destroy session which should not exist and redirect to login page.
+            $session->destroy();
+            return redirect('user/login');
         }
     }
 
     /*
-    * This method lets users create account to leave-calendar app.    
+    * This controller lets users create a new accounts.
+    * To work on website users need to have an account.
     */
     public function register()
     {
-        //Messages for failed validation.
-        $ruleMessages = [
+        $validationErrorMessage = [
             'account_type_id' => [
                 'in_list' => 'Wybierz jeden z dwóch typów konta.',
             ],
             'first_name' => [
-                'alpha' => 'Podaj swoje imię bez polskich znaków.',
-                'min_length' => 'W polu Imie jest zbyt mało znaków (minimum 3 znaki).',
-                'max_length' => 'W polu Imie jest zbyt dużo znaków (maksymalnie 100 znaków).',
+                'alpha' => 'Pole Imie przyjmuje tylko litery bez polskich znaków.',
+                'min_length' => 'Pole Imie musi zawierać minimalnie 3 liter.',
+                'max_length' => 'Pole Imie może zawierać maksymalnie 100 liter.',
             ],
             'last_name' => [
-                'alpha_dash' => 'Podaj swoje nazwisko bez polskich znaków',
-                'min_length' => 'W polu Nazwisko jest zbyt mało znaków (minimum 3 znaki).',
-                'max_length' => 'W polu Nazwisko jest zbyt dużo znaków (maksymalnie 100 znaków).',
+                'alpha_dash' => 'Pole Nazwisko przyjmuje tylko litery bez polskich znaków oraz znak -.',
+                'min_length' => 'Pole Nazwisko musi zawierać minimalnie 3 litery.',
+                'max_length' => 'Pole Nazwisko może zawierać maksymalnie 100 liter.',
             ],
             'email' => [
                 'valid_email' => 'To nie jest poprawny adres email.',
-                'max_length' => 'W polu Email jest zbyt dużo znaków (maksymalnie 100 znaków).',
-                'isEmailFreeToUse' => 'Podany email jest już wykorzystany.',
+                'max_length' => 'Pole Email może zawierać maksymalnie 100 znaków.',
+                'isEmailFreeToUse' => 'Na podany adres Email jest już stworzone konto.',
             ],
             'password' => [
-                'min_length' => 'Podane hasło jest zbyt krótkie (minimum 6 znaków).',
-                'max_length' => 'Podane haslo jest zbyt długie (maksymalnie 16 znaków).',
+                'min_length' => 'Pole Hasło musi zawierać minimalnie 6 znaków.',
+                'max_length' => 'Pole Hasło może zawierać maksymalnie 16 znaków.',
             ],
             'password_validate' => [
-                'matches' => 'Podane hasła nie są identyczne.',
+                'matches' => 'Podane Hasła nie są identyczne.',
             ],
         ];
 
-        //Check if validation was successful.
         if ($this->request->getMethod() === 'post' && $this->validate([
             'account_type_id' => 'in_list[1,2]',
             'first_name' => 'alpha|min_length[3]|max_length[100]',
@@ -85,9 +89,10 @@ class User extends Controller
             'email' => 'valid_email|max_length[100]|isEmailFreeToUse',
             'password' => 'min_length[6]|max_length[16]',
             'password_validate' => 'matches[password]',
-        ], $ruleMessages)) {
+        ], $validationErrorMessage)) {
+
             $userModel = new UserModel();
-            //Create user account
+
             $userModel->createUser(
                 $this->request->getPost('email'),
                 $this->request->getPost('password'),
@@ -95,61 +100,61 @@ class User extends Controller
                 $this->request->getPost('last_name'),
                 $this->request->getPost('account_type_id')
             );
-            //After successful signing in redirect user to main page of app.
-            return redirect()->to('/');
+
+            //After successful registration redirect user to main page.
+            return redirect('/');
         } else {
             $accountTypeModel = new AccountTypeModel();
-            $accountType['accounts'] = $accountTypeModel->getAccountTypes();
+            $accountTypes['accountTypes'] = $accountTypeModel->getAccountTypes();
 
             //Displaying form of creating account.
             echo view('Views/templates/header');
-            echo view('Views/user/register', $accountType);
+            echo view('Views/user/register', $accountTypes);
             echo view('Views/templates/footer');
         }
     }
 
     /*
-    * User log in to app using his email and password.
+    * This controller creates session after successful login to website.
     */
     public function login()
     {
-        $userModel = new UserModel();
-        //Messages for failed validation.
-        $ruleMessages = [
+        $validationLoginError['errorMessage'] = '';
+
+        $validationErrorMessage = [
             'email' => [
                 'valid_email' => 'To nie jest poprawny adres email.',
-                'max_length' => 'W polu Email jest zbyt dużo znaków (maksymalnie 100 znaków).',
-            ],
-            'password' => [
-                'min_length' => 'Podane hasło jest zbyt krótkie (minimum 6 znaków).',
-                'max_length' => 'Podane haslo jest zbyt długie (maksymalnie 16 znaków).',
             ],
         ];
-        //Check if validation was successful.
-        if ($this->request->getMethod() === 'get' && $this->validate([
-            'email' => 'valid_email|max_length[100]',
-            'password' => 'min_length[6]|max_length[16]',
-        ], $ruleMessages)) {
-            //Get password for given email.
-            $databasePassword = $userModel->getPassword($this->request->getGet('email'));
 
-            echo view('Views/templates/header');
+        if ($this->request->getMethod() === 'get' && $this->validate([
+            'email' => 'valid_email',
+        ], $validationErrorMessage)) {
+
+            $userModel = new UserModel();
+
+            //Get hashed password basen on provided email.
+            $hashedPassword = $userModel->getPassword($this->request->getGet('email'));
+
             //If passwords are the same create session for this user.
-            if (password_verify($this->request->getGet('password'), $databasePassword['password'])) {
+            if (password_verify($this->request->getGet('password'), $hashedPassword['password'])) {
+
                 $session = session();
                 $session->set($userModel->getUser($this->request->getGet('email')));
+
+                //After successful login redirect user to his main view.
                 return redirect('user');
             } else {
                 //If something went wrong display information about wrong email or password.
+                $validationLoginError['errorMessage'] = 'Podano zły email lub hasło.';
                 echo view('Views/templates/header');
-                echo '<b>Błędny email lub hasło</b>';
-                echo view('Views/user/login');
+                echo view('Views/user/login', $validationLoginError);
                 echo view('Views/templates/footer');
             }
         } else {
-            //Display form of log in to app.
+            //Display form of log in to website.
             echo view('Views/templates/header');
-            echo view('Views/user/login');
+            echo view('Views/user/login', $validationLoginError);
             echo view('Views/templates/footer');
         }
     }

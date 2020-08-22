@@ -96,7 +96,7 @@ for ($i = 0; $i < $daysInMonth; $i++) {
     $dayOfWeek = date('w', mktime(0, 0, 0, $month, $i, $year));
 
     echo '<td>';
-    if ($dayOfWeek >= 5 || in_array($day, $nationalDays)) {
+    if ($dayOfWeek >= 5 || in_array($day, $publicHolidays)) {
         echo 'X';
     }
     echo '</td>';

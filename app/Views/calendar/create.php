@@ -7,8 +7,8 @@
     <label for="company_id">Wybierz dla jakiej firmy tworzysz kalendarz:</label>
     <select name="company_id">
         <option value="0">Wybierz firme</option>
-        <?php foreach ($companies as $company) : ?>
-            <option value="<?=esc($company['id'])?>"><?= esc($company['name']) ?>
+        <?php foreach (esc($companyList) as $company) : ?>
+            <option value="<?=$company['id']?>"><?= $company['name'] ?>
         <?php endforeach ?>
     </select>
     <input type="submit" name="submit" value="Stwórz kalendarz" />
