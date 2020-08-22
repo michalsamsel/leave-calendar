@@ -12,71 +12,70 @@ class CalendarModel extends Model
     protected $allowedFields = ['owner_id', 'company_id', 'name', 'invite_code'];
 
     /*
-    * This method is used during creating new calendar by user.
-    * If given code is already used it needs to create a new code.
-    * Every invite code should be unique.
+    * This method is used during creaton of new calendar.
+    * If name variable will be empty the name of calendar should be identical to name of company.
+    * Method generates on it's own unique invite code for calendar.
     */
-
-    protected function isInviteCodeUsed($invite_code = null)
-    {
-        if (is_string($invite_code)) {
-            return $this->asArray()
-                ->select('invite_code')
-                ->where(['invite_code' => $invite_code])
-                ->first();
-        }
-    }
-
-    /*
-    * This method is used for add new calendar to database.
-    * It gets values from user like name or company id but it generate invite code on its own.
-    * If user does not pass name to function it takes default name of company which he had to choose in form.
-    */
-
-    public function createCalendar($owner_id = null, $company_id = null, $name = null)
+    public function createCalendar(int $ownerId, int $companyId, string $name = null)
     {
         $data = [
-            'owner_id' => $owner_id,
-            'company_id' => $company_id,
+            'owner_id' => $ownerId,
+            'company_id' => $companyId,
+            'name' => $name,
         ];
 
         if ($name === null || $name == '') {
+            //If name of calendar is not provided then insert name of company.
             $companyModel = new CompanyModel();
-            $data['name'] = $companyModel->getCompanyName($company_id);
-        } else {
-            $data['name'] = $name;
+            $data['name'] = $companyModel->getName($companyId);
         }
 
         do {
-            $invite_code = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyz'), 0, 6);
-        } while ($this->isInviteCodeUsed($invite_code));
-        $data['invite_code'] = $invite_code;
+            //This loop should break when un used invite code is generated.
+            $inviteCode = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyz'), 0, 6);
+        } while ($this->isInviteCodeUsed($inviteCode));
+
+        $data['invite_code'] = $inviteCode;
 
         return $this->save($data);
     }
 
     /*
-    * This method is used for displaying all calendars which user created
+    * This method is used when new invite code is generating for a new callendar.
+        It checks if generated code doesn't already exist.
+    * Every invite code should be unique.
     */
-    public function getOwnerCalendars($owner_id = null)
+    protected function isInviteCodeUsed(string $inviteCode): bool
     {
-        if ($owner_id !== null) {
-            return $this->select(['id', 'name', 'invite_code'])
-                ->where(['owner_id' => $owner_id])
-                ->findAll();
+        if ($this->asArray()
+            ->select('invite_code')
+            ->where(['invite_code' => $inviteCode])
+            ->first()
+        ) {
+            return true;
         }
+        return false;
     }
 
     /*
-    * This method looks for id of calendar based on invite_code
+    * This method is used to display all calendars which supervisor created.
     */
-    public function getCalendarId($invite_code = null)
+    public function getCalendarList(int $ownerId): array
     {
-        if ($invite_code !== null) {
-            return $this->asArray()
-                ->select('id')
-                ->where(['invite_code' => $invite_code])
-                ->first();
-        }
+        return $this->asArray()
+            ->select(['id', 'name', 'invite_code'])
+            ->where(['owner_id' => $ownerId])
+            ->findAll();
+    }
+
+    /*
+    * This method is used to get id of calendar based on given invite code.
+    */
+    public function getId(string $invite_code): array
+    {
+        return $this->asArray()
+            ->select('id')
+            ->where(['invite_code' => $invite_code])
+            ->first();
     }
 }

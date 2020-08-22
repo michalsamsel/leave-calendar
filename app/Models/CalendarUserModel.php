@@ -12,48 +12,46 @@ class CalendarUserModel extends Model
     protected $allowedFields = ['calendar_id', 'user_id', 'user_department_id'];
 
     /*
-    * This method is used for displaying all callendars which user joined by invite code
+    * This method create connection betweend user and calendar.
+    * Function checks if user didnt already joined calendar.
     */
-
-    public function joinCalendar($user_id = null, $invite_code = null)
+    public function joinCalendar(int $userId, string $invite_code)
     {
         $calendarModel = new CalendarModel();
+        $calendarId = $calendarModel->getId($invite_code);
 
-        $calendar_id = $calendarModel->getCalendarId($invite_code);
+        $data = [
+            'user_id' => $userId,
+            'calendar_id' => $calendarId['id'],
+        ];
 
-        if($invite_code!==null && $calendar_id){
-            $data = [
-                'user_id' => $user_id,
-                'calendar_id' => $calendar_id['id'],
-            ];
-    
-            if (!in_array(null, $data) && ! $this->userAlreadyJoined($user_id, $calendar_id)) {
-                return $this->save($data);
-            }
-        }  
-        else{
-            return false;
-        }  
-
-    }
-
-    public function getWorkerCalendars($user_id = null)
-    {
-        if ($user_id !== null) {
-            return $this->query('SELECT c.name, c.invite_code FROM calendar_user AS cu, calendar AS c WHERE '.$this->escape($user_id).'=cu.user_id AND c.id=cu.calendar_id')->getResultArray();
+        if (!$this->isUserAlreadyInvited($data['user_id'], $data['calendar_id'])) {
+            return $this->save($data);
         }
     }
 
-    protected function userAlreadyJoined($user_id, $calendar_id)
+    /*
+    * This method checks and returns information if user joined specific calendar.
+    */
+    protected function isUserAlreadyInvited(int $userId, int $calendarId): bool
     {
-        if($this->asArray()
-            ->where(['user_id' => $user_id, 'calendar_id' => $calendar_id])
-            ->first())
-            {
-                return true;
-            }
-            else{
-                return false;
-            }
+        if ($this->asArray()
+            ->where(['user_id' => $userId, 'calendar_id' => $calendarId])
+            ->first()
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    /*
+    * This method returns name and invite code of all calendars which worker joined.
+    */
+    public function getCalendarList(int $userId): array
+    {
+        return $this->query('SELECT c.name, c.invite_code 
+            FROM calendar_user AS cu, calendar AS c 
+            WHERE ' . $this->escape($userId) . '=cu.user_id AND c.id=cu.calendar_id')
+            ->getResultArray();
     }
 }

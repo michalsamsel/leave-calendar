@@ -21,7 +21,7 @@ class User extends Controller
             //Load page for user with account type of 'company owner'.
             if ($session->get('account_type_id') == 1) {
                 $calendarModel = new CalendarModel();
-                $calendarList['calendars'] = $calendarModel->getOwnerCalendars($session->get('id'));
+                $calendarList['calendars'] = $calendarModel->getCalendarList($session->get('id'));
                 echo view('Views/templates/header');
                 echo view('Views/user/companyOwner', $calendarList);
                 echo view('Views/templates/footer');
@@ -29,7 +29,7 @@ class User extends Controller
             //Load page for user with account type of 'company worker'.
             else if ($session->get('account_type_id') == 2) {
                 $calendarUserModel = new CalendarUserModel();
-                $calendarUserList['calendars'] = $calendarUserModel->getWorkerCalendars($session->get('id'));
+                $calendarUserList['calendars'] = $calendarUserModel->getCalendarList($session->get('id'));
                 echo view('Views/templates/header');
                 echo view('Views/user/companyWorker', $calendarUserList);
                 echo view('Views/templates/footer');
@@ -89,11 +89,11 @@ class User extends Controller
             $userModel = new UserModel();
             //Create user account
             $userModel->createUser(
-                $this->request->getPost('account_type_id'),
+                $this->request->getPost('email'),
+                $this->request->getPost('password'),
                 $this->request->getPost('first_name'),
                 $this->request->getPost('last_name'),
-                $this->request->getPost('email'),
-                $this->request->getPost('password')
+                $this->request->getPost('account_type_id')
             );
             //After successful signing in redirect user to main page of app.
             return redirect()->to('/');
@@ -131,13 +131,13 @@ class User extends Controller
             'password' => 'min_length[6]|max_length[16]',
         ], $ruleMessages)) {
             //Get password for given email.
-            $databasePassword = $userModel->passwordVerify($this->request->getGet('email'));
+            $databasePassword = $userModel->getPassword($this->request->getGet('email'));
 
             echo view('Views/templates/header');
             //If passwords are the same create session for this user.
             if (password_verify($this->request->getGet('password'), $databasePassword['password'])) {
                 $session = session();
-                $session->set($userModel->getUserData($this->request->getGet('email')));
+                $session->set($userModel->getUser($this->request->getGet('email')));
                 return redirect('user');
             } else {
                 //If something went wrong display information about wrong email or password.

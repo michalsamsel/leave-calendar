@@ -70,7 +70,7 @@ class Calendar extends Controller
         if (session()->get('account_type_id') == 1) {
             $userModel = new UserModel();
             $data['users'] = $userModel->getUserList($invite_code);
-            $data['daysOfLeave'] = $daysOfLeaveModel->getAllUsersDays($data['invite_code'], $data['year']);
+            $data['daysOfLeave'] = $daysOfLeaveModel->getAllUsersNumberOfDays($data['invite_code'], $data['year']);
 
             if ($this->request->getMethod() === 'post') {
                 $leaves = $this->request->getPost('leaves');
@@ -104,16 +104,16 @@ class Calendar extends Controller
                         continue;
                     }
                     $calendarModel = new CalendarModel();
-                    $calendar_id = $calendarModel->getCalendarId($data['invite_code']);
+                    $calendar_id = $calendarModel->getId($data['invite_code']);
                     $leave['calendar_id'] = $calendar_id['id'];
                     $leave['working_days_used'] = $days;
                     $leaves[$leave['user_id']] = $leave;
                     $leaveModel = new LeaveModel();
-                    $leaveModel->addLeave($leave);
+                    $leaveModel->createLeave($leave);
                 }
                 $data['test'] = $leaves;
                 
-                //$leaveModel->addLeave($leaves);                
+                //$leaveModel->createLeave($leaves);                
             }
 
             echo view('Views/templates/header');
@@ -130,15 +130,15 @@ class Calendar extends Controller
             if ($this->request->getMethod() === 'post' && $this->validate([
                 'number_of_days' => 'greater_than_equal_to[0]min_length[1]',
             ], $ruleMessages)) {
-                $daysOfLeaveModel->saveDays(
-                    $invite_code,
+                $daysOfLeaveModel->updateNumberOfDays(
                     $session->get('id'),
+                    $invite_code,
                     $this->request->getPost('year'),
                     $this->request->getPost('number_of_days')
                 );
             }
 
-            $userDaysOfLeave = $daysOfLeaveModel->getUserDays($session->get('id'), $data['invite_code'], $data['year']);
+            $userDaysOfLeave = $daysOfLeaveModel->getNumberOfDays($session->get('id'), $data['invite_code'], $data['year']);
             if (empty($userDaysOfLeave['number_of_days'])) {
                 $data['numberOfDays'] = 0;
             } else {
@@ -178,7 +178,7 @@ class Calendar extends Controller
         } else {
             $companyModel = new CompanyModel();
             //Get users list of companies which he added to database.
-            $companyArray['companies'] = $companyModel->getCompanyArray($session->get('id'));
+            $companyArray['companies'] = $companyModel->getCompanyList($session->get('id'));
 
             //Displaying form of creating calendar for specific company.
             echo view('Views/templates/header');

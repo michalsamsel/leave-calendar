@@ -8,7 +8,11 @@ class DepartmentTypeModel extends Model
 {
     protected $table = 'department_type';
 
-    public function getDepartmentTypes()
+    /*
+    * This method is for getting all department types in app.
+    * Usage for this data is not implemented yet.
+    */
+    public function getDepartmentTypes(): array
     {
         return $this->findAll();
     }

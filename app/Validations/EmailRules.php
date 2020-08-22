@@ -14,7 +14,7 @@ class EmailRules
         $userModel = new UserModel();
 
         //If email is not avaible to use return false.
-        if ($userModel->emailVerify($email)) {
+        if ($userModel->getEmail($email)) {
             return false;
         }
         //If email is avaible to use return true.
