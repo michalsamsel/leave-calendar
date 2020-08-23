@@ -23,31 +23,22 @@ class User extends Controller
             return redirect('user/login');
         }
 
-        //Load page for supervisor.
+        //Load calendar list for supervisor.
         if ($session->get('account_type_id') == 1) {
 
             $calendarModel = new CalendarModel();
             $calendarList['calendarList'] = $calendarModel->getCalendarList($session->get('id'));
-
-            echo view('Views/templates/header');
-            echo view('Views/user/companyOwner', $calendarList);
-            echo view('Views/templates/footer');
         }
-        //Load page for worker.
+        //Load calendar list for worker.
         else if ($session->get('account_type_id') == 2) {
             $calendarUserModel = new CalendarUserModel();
             $calendarList['calendarList'] = $calendarUserModel->getCalendarList($session->get('id'));
-
-            echo view('Views/templates/header');
-            echo view('Views/user/companyWorker', $calendarList);
-            echo view('Views/templates/footer');
-        } else {
-            //Other account types shouldnt exist so destroy session which should not exist and redirect to login page.
-            $session->destroy();
-            return redirect('user/login');
         }
+        
+        echo view('Views/templates/header');
+        echo view('Views/user/calendarList', $calendarList);
+        echo view('Views/templates/footer');
     }
-
     /*
     * This controller lets users create a new accounts.
     * To work on website users need to have an account.
@@ -133,20 +124,20 @@ class User extends Controller
             ],
         ];
 
-        if ($this->request->getMethod() === 'get' && $this->validate([
+        if ($this->request->getMethod() === 'post' && $this->validate([
             'email' => 'valid_email',
         ], $validationErrorMessage)) {
 
             $userModel = new UserModel();
 
             //Get hashed password basen on provided email.
-            $hashedPassword = $userModel->getPassword($this->request->getGet('email'));
+            $hashedPassword = $userModel->getPassword($this->request->getPost('email'));
 
             //If passwords are the same create session for this user.
-            if (password_verify($this->request->getGet('password'), $hashedPassword['password'])) {
+            if (password_verify($this->request->getPost('password'), $hashedPassword['password'])) {
 
                 $session = session();
-                $session->set($userModel->getUser($this->request->getGet('email')));
+                $session->set($userModel->getUser($this->request->getPost('email')));
 
                 //After successful login redirect user to his main view.
                 return redirect('user');

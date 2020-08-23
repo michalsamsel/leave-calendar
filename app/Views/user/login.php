@@ -5,7 +5,7 @@
     <div class="row justify-content-center border border-danger">
         <?= \Config\Services::validation()->listErrors(); ?>
     </div>
-    <form action="<?= route_to('App\Controllers\User::login')?>" method="get">
+    <form action="<?= route_to('App\Controllers\User::login')?>" method="post">
         <?= csrf_field() ?>
         <div class="row">
             <div class="col text-right">
