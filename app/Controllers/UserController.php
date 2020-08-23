@@ -8,7 +8,7 @@ use App\Models\UserModel;
 use App\Models\CalendarModel;
 use App\Models\CalendarUserModel;
 
-class User extends Controller
+class UserController extends Controller
 {
     /*
     * This controller loads pages based on type of account.
@@ -34,7 +34,7 @@ class User extends Controller
             $calendarUserModel = new CalendarUserModel();
             $calendarList['calendarList'] = $calendarUserModel->getCalendarList($session->get('id'));
         }
-        
+
         echo view('Views/templates/header');
         echo view('Views/user/calendarList', $calendarList);
         echo view('Views/templates/footer');

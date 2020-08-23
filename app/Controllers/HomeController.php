@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-class Home extends BaseController
+class HomeController extends BaseController
 {
 	/*
 	* This displays main page after someone enteres the website.

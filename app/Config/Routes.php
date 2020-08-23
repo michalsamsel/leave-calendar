@@ -30,19 +30,19 @@ $routes->setAutoRoute(true);
 
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
-$routes->get('/', 'Home::index');
+$routes->get('/', 'HomeController::index');
 
-$routes->get('user', 'User::index');
-$routes->match(['get', 'post'], 'user/register', 'User::register');
-$routes->get('user/login', 'User::login');
-$routes->get('user/logout', 'User::logout');
+$routes->get('user', 'UserController::index');
+$routes->match(['get', 'post'], 'user/register', 'UserController::register');
+$routes->match(['get', 'post'], 'user/login', 'UserController::login');
+$routes->get('user/logout', 'UserController::logout');
 
-$routes->match(['get', 'post'], 'company/create', 'Company::create');
+$routes->match(['get', 'post'], 'company/create', 'CompanyController::create');
 
-$routes->match(['get', 'post'], 'calendar/create', 'Calendar::create');
-$routes->match(['get', 'post'], 'calendar/join', 'Calendar::join');
-$routes->get('calendar/(:alphanum)', 'Calendar::index/$1');
-$routes->match(['get','post'],'calendar/(:alphanum)/month/(:num)/year/(:num)', 'Calendar::index/$1/$2/$3');
+$routes->match(['get', 'post'], 'calendar/create', 'CalendarController::create');
+$routes->match(['get', 'post'], 'calendar/join', 'CalendarController::join');
+$routes->get('calendar/(:alphanum)', 'CalendarController::index/$1');
+$routes->match(['get','post'],'calendar/(:alphanum)/month/(:num)/year/(:num)', 'CalendarController::index/$1/$2/$3');
 
 /**
  * --------------------------------------------------------------------

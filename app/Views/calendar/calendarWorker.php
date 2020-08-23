@@ -44,19 +44,19 @@ $monthNames = [
 ];
 
 if($month > 1){
-    echo '<a href="'. route_to('App\Controllers\Calendar::index', $invite_code, $month-1, $year).'">Poprzedni miesiąc</a>';
+    echo '<a href="'. route_to('App\Controllers\CalendarController::index', $invite_code, $month-1, $year).'">Poprzedni miesiąc</a>';
 }
 else
 {
-    echo '<a href="'. route_to('App\Controllers\Calendar::index', $invite_code, 12, $year-1).'">Poprzedni miesiąc</a>';
+    echo '<a href="'. route_to('App\Controllers\CalendarController::index', $invite_code, 12, $year-1).'">Poprzedni miesiąc</a>';
 }
 echo ' '. $monthNames[$month] . ' ' . $year . ' ';
 if($month < 12){
-    echo '<a href="'. route_to('App\Controllers\Calendar::index', $invite_code, $month+1, $year).'">Następny miesiąc</a>';
+    echo '<a href="'. route_to('App\Controllers\CalendarController::index', $invite_code, $month+1, $year).'">Następny miesiąc</a>';
 }
 else
 {
-    echo '<a href="'. route_to('App\Controllers\Calendar::index', $invite_code, 1, $year+1).'">Następny miesiąc</a>';
+    echo '<a href="'. route_to('App\Controllers\CalendarController::index', $invite_code, 1, $year+1).'">Następny miesiąc</a>';
 }
 
 echo '<table id="calendar">';
@@ -117,7 +117,7 @@ echo '</table>';
 
 <br />
 <?= \Config\Services::validation()->listErrors(); ?>
-<form action="<?=route_to('App\Controllers\Calendar::index', $invite_code, $month, $year)?>" method="post">
+<form action="<?=route_to('App\Controllers\CalendarController::index', $invite_code, $month, $year)?>" method="post">
     <?= csrf_field() ?>
     <label for="number_of_days">Wpisz liczbe dni urlopu na rok <?= $year ?>:</label>
     <input type="text" name="number_of_days" /> <br /><br />

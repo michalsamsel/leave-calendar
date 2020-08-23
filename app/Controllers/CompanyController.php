@@ -5,7 +5,7 @@ namespace App\Controllers;
 use CodeIgniter\Controller;
 use App\Models\CompanyModel;
 
-class Company extends Controller
+class CompanyController extends Controller
 {
     /*
     * This controller creates a new company on user demand.

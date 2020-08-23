@@ -10,7 +10,7 @@ use App\Models\DaysOfLeaveModel;
 use App\Models\LeaveModel;
 use App\Models\UserModel;
 
-class Calendar extends Controller
+class CalendarController extends Controller
 {
     /* This controller shows calendar for user.
     * It also calculates date based on given,
@@ -152,7 +152,7 @@ class Calendar extends Controller
             );
 
             //Get days in month when users have leave and mark it on calendar.
-            $datesOfLeave = $leaveModel->getAllDaysFromTo(                
+            $datesOfLeave = $leaveModel->getAllDaysFromTo(
                 $calendarId['id'],
                 $data['month'],
                 $data['year']
