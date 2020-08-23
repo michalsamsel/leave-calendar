@@ -15,41 +15,39 @@
                 <li class="nav-item active">
                     <a class="nav-link" href="<?= route_to('App\Controllers\UserController::index') ?>">Strona główna<span class="sr-only">(current)</span></a>
                 </li>
+
                 <?php
                 $session = session();
-                if($session->get('account_type_id') == 1)
-                {
-                    //Supervisor functions
-                    echo '<li class="nav-item">';
-                    echo '<a class="nav-link" href="' . route_to('App\Controllers\CompanyController::create') . '">Dodaj firmę</a>';
-                    echo '</li>';
-                    echo '<li class="nav-item">';
-                    echo '<a class="nav-link" href="' . route_to('App\Controllers\CalendarController::create') . '">Stwórz kalendarz</a>';
-                    echo '</li>';
-                }
-                else if($session->get('account_type_id') == 2)
-                {
-                    //Worker functions
-                    echo '<li class="nav-item">';
-                    echo '<a class="nav-link" href="' . route_to('App\Controllers\CalendarController::join') . '">Dołącz do kalendarza</a>';
-                    echo '</li>';
-                }
-
-                if ($session->get('id') == null) {
-                    //If someone is not logged in
-                    echo '<li class="nav-item">';
-                    echo '<a class="nav-link" href="' . route_to('App\Controllers\UserController::login') . '">Zaloguj się</a>';
-                    echo '</li>';
-                    echo '<li class="nav-item">';
-                    echo '<a class="nav-link" href="' . route_to('App\Controllers\UserController::register') . '">Zarejestruj się</a>';
-                    echo '</li>';
-                } else {
-                    //Logged user navbar.
-                    echo '<li class="nav-item">';
-                    echo '<a class="nav-link" href="' . route_to('App\Controllers\UserController::logout') . '">Wyloguj się</a>';
-                    echo '</li>';
-                }
+                $userId = $session->get('id');
+                $accountTypeId = $session->get('account_type_id');
+                if ($accountTypeId == 1) :
                 ?>
+                    <!--Supervisor functions-->
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= route_to('App\Controllers\CompanyController::create') ?>">Dodaj firmę</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= route_to('App\Controllers\CalendarController::create') ?>">Stwórz kalendarz</a>
+                    </li>
+                <?php elseif ($accountTypeId == 2) : ?>
+                    <!--Worker functions-->
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= route_to('App\Controllers\CalendarController::join') ?>">Dołącz do kalendarza</a>
+                    </li>
+                <?php endif ?>
+
+                <?php if ($userId == null) : ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= route_to('App\Controllers\UserController::login') ?>">Zaloguj się</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= route_to('App\Controllers\UserController::register') ?>">Zarejestruj się</a>
+                    </li>
+                <?php else : ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= route_to('App\Controllers\UserController::logout') ?>">Wyloguj się</a>
+                    </li>
+                <?php endif ?>
             </ul>
         </div>
     </nav>
