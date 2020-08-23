@@ -15,12 +15,39 @@
                 <li class="nav-item active">
                     <a class="nav-link" href="<?= route_to('App\Controllers\User::index') ?>">Strona główna<span class="sr-only">(current)</span></a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="<?= route_to('App\Controllers\User::login') ?>">Zaloguj się</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="<?= route_to('App\Controllers\User::logout') ?>">Wyloguj się</a>
-                </li>
+                <?php
+                $session = session();
+                if($session->get('account_type_id') == 1)
+                {
+                    echo '<li class="nav-item">';
+                    echo '<a class="nav-link" href="' . route_to('App\Controllers\Company::create') . '">Dodaj firmę</a>';
+                    echo '</li>';
+                    echo '<li class="nav-item">';
+                    echo '<a class="nav-link" href="' . route_to('App\Controllers\Calendar::create') . '">Stwórz kalendarz</a>';
+                    echo '</li>';
+                }
+                else if($session->get('account_type_id') == 2)
+                {
+                    echo '<li class="nav-item">';
+                    echo '<a class="nav-link" href="' . route_to('App\Controllers\Calendar::join') . '">Dołącz do kalendarza</a>';
+                    echo '</li>';
+                }
+
+                if ($session->get('id') == null) {
+                    //If someone is not logged in
+                    echo '<li class="nav-item">';
+                    echo '<a class="nav-link" href="' . route_to('App\Controllers\User::login') . '">Zaloguj się</a>';
+                    echo '</li>';
+                    echo '<li class="nav-item">';
+                    echo '<a class="nav-link" href="' . route_to('App\Controllers\User::login') . '">Zarejestruj się</a>';
+                    echo '</li>';
+                } else {
+                    //Logged user navbar.
+                    echo '<li class="nav-item">';
+                    echo '<a class="nav-link" href="' . route_to('App\Controllers\User::logout') . '">Wyloguj się</a>';
+                    echo '</li>';
+                }
+                ?>
             </ul>
         </div>
     </nav>
