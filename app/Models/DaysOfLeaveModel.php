@@ -45,7 +45,7 @@ class DaysOfLeaveModel extends Model
     {
         $data = [
             'user_id' => $userId,
-            'calendar_id' => $calendarId['id'],
+            'calendar_id' => $calendarId,
             'year' => $year,
         ];
 
