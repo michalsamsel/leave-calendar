@@ -25,16 +25,17 @@ class UserController extends Controller
             return redirect('user/login');
         }
 
-        //Load calendar list for supervisor.
-        if ($accountTypeId == 1) {
-
-            $calendarModel = new CalendarModel();
-            $calendarList['calendarList'] = $calendarModel->getCalendarList($userId);
-        }
-        //Load calendar list for worker.
-        else if ($accountTypeId == 2) {
-            $calendarUserModel = new CalendarUserModel();
-            $calendarList['calendarList'] = $calendarUserModel->getCalendarList($userId);
+        switch ($userId) {
+            case 1:
+                //Load calendar list for supervisor.
+                $calendarModel = new CalendarModel();
+                $calendarList['calendarList'] = $calendarModel->getCalendarList($userId);
+                break;
+            case 2:
+                //Load calendar list for worker.
+                $calendarUserModel = new CalendarUserModel();
+                $calendarList['calendarList'] = $calendarUserModel->getCalendarList($userId);
+                break;
         }
 
         echo view('Views/templates/header');
