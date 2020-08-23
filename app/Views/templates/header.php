@@ -19,6 +19,7 @@
                 $session = session();
                 if($session->get('account_type_id') == 1)
                 {
+                    //Supervisor functions
                     echo '<li class="nav-item">';
                     echo '<a class="nav-link" href="' . route_to('App\Controllers\Company::create') . '">Dodaj firmę</a>';
                     echo '</li>';
@@ -28,6 +29,7 @@
                 }
                 else if($session->get('account_type_id') == 2)
                 {
+                    //Worker functions
                     echo '<li class="nav-item">';
                     echo '<a class="nav-link" href="' . route_to('App\Controllers\Calendar::join') . '">Dołącz do kalendarza</a>';
                     echo '</li>';
@@ -39,7 +41,7 @@
                     echo '<a class="nav-link" href="' . route_to('App\Controllers\User::login') . '">Zaloguj się</a>';
                     echo '</li>';
                     echo '<li class="nav-item">';
-                    echo '<a class="nav-link" href="' . route_to('App\Controllers\User::login') . '">Zarejestruj się</a>';
+                    echo '<a class="nav-link" href="' . route_to('App\Controllers\User::register') . '">Zarejestruj się</a>';
                     echo '</li>';
                 } else {
                     //Logged user navbar.
