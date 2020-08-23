@@ -34,11 +34,34 @@ class LeaveModel extends Model
     public function countUserDays(int $userId, int $calendarId, int $year)
     {
         return $this->asArray()
-        ->where(['user_id' => $userId, 'calendar_id' => $calendarId])
-        ->like('from', $year, 'after')
-        ->like('to', $year, 'after')
-        ->select('user_id')
-        ->selectSum('working_days_used')
-        ->first();
+            ->where(['user_id' => $userId, 'calendar_id' => $calendarId])
+            ->like('from', $year, 'after')
+            ->like('to', $year, 'after')
+            ->select('user_id')
+            ->selectSum('working_days_used')
+            ->first();
+    }
+
+    /*
+    * This method gets all days of leave user used in month.
+    * Later that data will be used to mark on calendar when user had leave.
+    */
+    public function getUserDaysFromTo(int $userId, int $calendarId, int $month, int $year)
+    {
+        if($month < 10)
+        {
+            $date = strval($year) . '-0' . strval($month);
+        }
+        else
+        {
+            $date = strval($year) . '-' . strval($month);
+        }
+        
+        return $this->asArray()
+            ->where(['user_id' => $userId])
+            ->like('from', $date, 'after')
+            ->like('to', $date, 'after')
+            ->select(['user_id', 'from', 'to'])
+            ->findAll();
     }
 }

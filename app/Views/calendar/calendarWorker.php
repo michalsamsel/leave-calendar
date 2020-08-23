@@ -88,8 +88,8 @@ echo '</tr>';
 echo '<tr>';
 echo '<td>' . $session->get('first_name') . ' ' . $session->get('last_name') . '</td>';
 echo '<td>'.esc($numberOfDays).'</td>';
-echo '<td>'.esc($userWorkingDaysUsed['working_days_used']).'</td>';
-echo '<td>'. (esc($numberOfDays) - esc($userWorkingDaysUsed['working_days_used'])).'</td>';
+echo '<td>'.esc($userWorkingDaysUsed).'</td>';
+echo '<td>'. (esc($numberOfDays) - esc($userWorkingDaysUsed)).'</td>';
 
 for ($i = 0; $i < $daysInMonth; $i++) {
     $day = (date(mktime(0, 0, 0, $month, $i + 1, $year)));
@@ -98,6 +98,16 @@ for ($i = 0; $i < $daysInMonth; $i++) {
     echo '<td>';
     if ($dayOfWeek >= 5 || in_array($day, $publicHolidays)) {
         echo 'X';
+    }
+    else
+    {
+        foreach($leaveDates as $leave)
+        {
+            if(strtotime($leave['from']) <= $day && strtotime($leave['to']) >= $day){
+                echo 'O';
+            break;                            
+            }
+        }
     }
     echo '</td>';
 }

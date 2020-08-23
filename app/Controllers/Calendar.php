@@ -106,10 +106,9 @@ class Calendar extends Controller
                     } else if (empty($leave['to'])) {
                         $leave['to'] = $leave['from'];
                     }
-                    
+
                     //If someone swaps first day and last day of leave, replace their values.
-                    if($leave['from'] > $leave['to'])
-                    {
+                    if ($leave['from'] > $leave['to']) {
                         $temporaryDate = $leave['from'];
                         $leave['from'] = $leave['to'];
                         $leave['to'] = $temporaryDate;
@@ -178,20 +177,37 @@ class Calendar extends Controller
                 $data['year']
             );
 
-            //Get number of days which user used for leaves and display them in 'wykorzystane' field. 
-            $userWorkingDaysUsed = $leaveModel->countUserDays(
-                $session->get('id'),
-                $calendarId['id'],
-                $data['year']
-            );
-            $data['userWorkingDaysUsed'] = $userWorkingDaysUsed;
-
             //If number of days wasnt updated yet, set them as 0 days.
             if (empty($userDaysOfLeave['number_of_days'])) {
                 $data['numberOfDays'] = 0;
             } else {
                 $data['numberOfDays'] = $userDaysOfLeave['number_of_days'];
             }
+
+            //Get number of days which user used for leaves and display them in 'wykorzystane' field. 
+            $userWorkingDaysUsed = $leaveModel->countUserDays(
+                $session->get('id'),
+                $calendarId['id'],
+                $data['year']
+            );
+
+            if(empty($userWorkingDaysUsed['working_days_used']))
+            {
+                $data['userWorkingDaysUsed'] = 0;
+            }
+            else
+            {
+                $data['userWorkingDaysUsed'] = $userWorkingDaysUsed['working_days_used'];
+            }            
+
+            //Get days in month when user had leave and mark it on calendar.
+            $datesOfLeave = $leaveModel->getUserDaysFromTo(
+                $session->get('id'),
+                $calendarId['id'],
+                $data['month'],
+                $data['year']
+            );
+            $data['leaveDates'] = $datesOfLeave;
 
             echo view('Views/templates/header');
             echo view('Views/calendar/calendarWorker', $data);
