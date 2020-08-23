@@ -20,20 +20,21 @@ class UserController extends Controller
         $userId = $session->get('id');
         $accountTypeId = $session->get('account_type_id');
 
+        $calendarModel = new CalendarModel();
+        $calendarUserModel = new CalendarUserModel();
+
         //If user was not logged in or his session ended redirect him to login website.
         if ($userId == null) {
             return redirect('user/login');
         }
 
-        switch ($userId) {
+        switch ($accountTypeId) {
             case 1:
-                //Load calendar list for supervisor.
-                $calendarModel = new CalendarModel();
+                //Load calendar list for supervisor.                
                 $calendarList['calendarList'] = $calendarModel->getCalendarList($userId);
                 break;
             case 2:
                 //Load calendar list for worker.
-                $calendarUserModel = new CalendarUserModel();
                 $calendarList['calendarList'] = $calendarUserModel->getCalendarList($userId);
                 break;
         }
@@ -48,6 +49,9 @@ class UserController extends Controller
     */
     public function register()
     {
+        $userModel = new UserModel();
+        $accountTypeModel = new AccountTypeModel();
+
         $validationErrorMessage = [
             'account_type_id' => [
                 'in_list' => 'Wybierz jeden z dwóch typów konta.',
@@ -85,8 +89,6 @@ class UserController extends Controller
             'password_validate' => 'matches[password]',
         ], $validationErrorMessage)) {
 
-            $userModel = new UserModel();
-
             $userModel->createUser(
                 $this->request->getPost('email'),
                 $this->request->getPost('password'),
@@ -98,9 +100,7 @@ class UserController extends Controller
             //After successful registration redirect user to main page.
             return redirect('/');
         } else {
-            $accountTypeModel = new AccountTypeModel();
             $accountTypes['accountTypes'] = $accountTypeModel->getAccountTypes();
-
             //Displaying form of creating account.
             echo view('Views/templates/header');
             echo view('Views/user/register', $accountTypes);
@@ -115,7 +115,9 @@ class UserController extends Controller
     {
         $session = session();
         $userId = $session->get('id');
-
+        
+        $userModel = new UserModel();
+        
         if ($userId != null) {
             //If user is logged in, redirect him to his main page.
             return redirect('user');
@@ -133,7 +135,6 @@ class UserController extends Controller
             'email' => 'valid_email',
         ], $validationErrorMessage)) {
 
-            $userModel = new UserModel();
 
             //Get hashed password basen on provided email.
             $hashedPassword = $userModel->getPassword($this->request->getPost('email'));

@@ -20,8 +20,8 @@
                     <input type="password" name="password" /> <br />
                     <input type="password" name="password_validate" /> <br />
                     <?php foreach (esc($accountTypes) as $accountType) : ?>
-                        <label for="<?= esc($accountType['id']) ?>"> <?= esc($accountType['name']) ?> </label>
-                        <input type="radio" value="<?= esc($accountType['id']) ?>" name="account_type_id" /> <br />
+                        <label for="<?= $accountType['id'] ?>"> <?= $accountType['name'] ?> </label>
+                        <input type="radio" value="<?= $accountType['id'] ?>" name="account_type_id" /> <br />
                     <?php endforeach ?>
                 </div>
             </div>

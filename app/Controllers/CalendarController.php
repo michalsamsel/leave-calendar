@@ -240,6 +240,9 @@ class CalendarController extends Controller
         $userId = $session->get('id');
         $accountTypeId = $session->get('account_type_id');
 
+        $calendarModel = new CalendarModel();
+        $companyModel = new CompanyModel();
+
         //If someone with diffrent account types gets here, redirect him to his main view.
         if ($accountTypeId != 1) {
             return redirect('user');
@@ -255,8 +258,6 @@ class CalendarController extends Controller
             'company_id' => 'greater_than[0]',
         ], $validationErrorMessage)) {
 
-            $calendarModel = new CalendarModel();
-
             $calendarModel->createCalendar(
                 $userId,
                 $this->request->getPost('company_id'),
@@ -265,8 +266,7 @@ class CalendarController extends Controller
 
             //After successful login redirect user to his main view.
             return redirect('user');
-        } else {
-            $companyModel = new CompanyModel();
+        } else {           
             //Get users list of companies which he added to database.
             $companyList['companyList'] = $companyModel->getCompanyList($userId);
 
@@ -287,6 +287,8 @@ class CalendarController extends Controller
         $userId = $session->get('id');
         $accountTypeId = $session->get('account_type_id');
 
+        $calendarUserModel = new CalendarUserModel();
+
         //If someone with diffrent account types gets here, redirect him to his main view.
         if ($accountTypeId != 2) {
             return redirect('user');
@@ -304,9 +306,7 @@ class CalendarController extends Controller
 
         if ($this->request->getMethod() === 'post' && $this->validate([
             'invite_code' => 'alpha_numeric|min_length[6]|max_length[6]',
-        ], $validationErrorMessage)) {
-
-            $calendarUserModel = new CalendarUserModel();
+        ], $validationErrorMessage)) {            
 
             if ($calendarUserModel->joinCalendar($userId, $this->request->getPost('invite_code'))) {
                 //If user joined calendar redirect him to his main page.

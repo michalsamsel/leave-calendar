@@ -17,13 +17,13 @@ class CompanyController extends Controller
         $userId = $session->get('id');
         $accountTypeId = $session->get('account_type_id');
 
+        $companyModel = new CompanyModel();
+        
         //If someone with other then supervisor account tries to open form, redirect him to main page.
         if($accountTypeId != 1)
         {
             return redirect('/');
-        }
-
-        $companyModel = new CompanyModel();
+        }    
 
         $validationErrorMessage = [
             'name' => [
