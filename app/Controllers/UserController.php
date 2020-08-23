@@ -17,22 +17,24 @@ class UserController extends Controller
     public function index()
     {
         $session = session();
+        $userId = $session->get('id');
+        $accountTypeId = $session->get('account_type_id');
 
         //If user was not logged in or his session ended redirect him to login website.
-        if ($session->get('id') == null) {
+        if ($userId == null) {
             return redirect('user/login');
         }
 
         //Load calendar list for supervisor.
-        if ($session->get('account_type_id') == 1) {
+        if ($accountTypeId == 1) {
 
             $calendarModel = new CalendarModel();
-            $calendarList['calendarList'] = $calendarModel->getCalendarList($session->get('id'));
+            $calendarList['calendarList'] = $calendarModel->getCalendarList($userId);
         }
         //Load calendar list for worker.
-        else if ($session->get('account_type_id') == 2) {
+        else if ($accountTypeId == 2) {
             $calendarUserModel = new CalendarUserModel();
-            $calendarList['calendarList'] = $calendarUserModel->getCalendarList($session->get('id'));
+            $calendarList['calendarList'] = $calendarUserModel->getCalendarList($userId);
         }
 
         echo view('Views/templates/header');
@@ -111,7 +113,9 @@ class UserController extends Controller
     public function login()
     {
         $session = session();
-        if ($session->get('id') != null) {
+        $userId = $session->get('id');
+
+        if ($userId != null) {
             //If user is logged in, redirect him to his main page.
             return redirect('user');
         }

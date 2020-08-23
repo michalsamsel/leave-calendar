@@ -14,9 +14,11 @@ class CompanyController extends Controller
     public function create()
     {
         $session = session();
+        $userId = $session->get('id');
+        $accountTypeId = $session->get('account_type_id');
 
         //If someone with other then supervisor account tries to open form, redirect him to main page.
-        if($session->get('account_type_id') != 1)
+        if($accountTypeId != 1)
         {
             return redirect('/');
         }
@@ -50,7 +52,7 @@ class CompanyController extends Controller
 
             //Add new company to database.
             $companyModel->createCompany(
-                $session->get('id'),
+                $userId,
                 $this->request->getPost('name'),
                 $this->request->getPost('nip'),
                 $this->request->getPost('city')

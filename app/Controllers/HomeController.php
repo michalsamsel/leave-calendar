@@ -11,7 +11,9 @@ class HomeController extends BaseController
 	public function index()
 	{
 		$session = session();
-		if ($session->get('id') != null) {
+		$userId = $session->get('id');
+
+		if ($userId != null) {
 			//If user is logged in, redirect him to his main page.
 			return redirect('user');
 		}

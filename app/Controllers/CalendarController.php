@@ -19,16 +19,21 @@ class CalendarController extends Controller
     public function index(string $invite_code, int $month = null, int $year = null)
     {
         $session = session();
-        $calendarUserModel = new CalendarUserModel();
+        $userId = $session->get('id');
+
         $calendarModel = new CalendarModel();
         $calendarId = $calendarModel->getId($invite_code);
         $calendarOwnerId = $calendarModel->getOwnerId($invite_code);
 
+        $calendarUserModel = new CalendarUserModel();
+        $leaveModel = new LeaveModel();
+        $daysOfLeaveModel = new DaysOfLeaveModel();
+
         //If someone didnt joined calenadr by code, redirect him to his main view.
         if (
-            $calendarOwnerId['owner_id'] != $session->get('id') &&
+            $calendarOwnerId['owner_id'] != $userId &&
             !$calendarUserModel->isUserMemberOfCalendar(
-                $session->get('id'),
+                $userId,
                 $calendarId['id']
             )
         ) {
@@ -79,9 +84,6 @@ class CalendarController extends Controller
         $publicHolidays[11] = strtotime("60 days", $publicHolidays[9]); //Adding 60 days to easter date.
 
         $data['publicHolidays'] = $publicHolidays;
-
-        $leaveModel = new LeaveModel();
-        $daysOfLeaveModel = new DaysOfLeaveModel();
 
         if (session()->get('account_type_id') == 1) {
             //Supervisor view.
@@ -178,7 +180,7 @@ class CalendarController extends Controller
                 'number_of_days' => 'max_length[2]|greater_than_equal_to[0]|required',
             ], $validationErrorMessage)) {
                 $daysOfLeaveModel->updateNumberOfDays(
-                    $session->get('id'),
+                    $userId,
                     $invite_code,
                     $this->request->getPost('year'),
                     $this->request->getPost('number_of_days')
@@ -187,7 +189,7 @@ class CalendarController extends Controller
 
             //Get number of days user have at all and display them in 'pula' field.
             $userDaysOfLeave = $daysOfLeaveModel->getNumberOfDays(
-                $session->get('id'),
+                $userId,
                 $data['invite_code'],
                 $data['year']
             );
@@ -201,7 +203,7 @@ class CalendarController extends Controller
 
             //Get number of days which user used for leaves and display them in 'wykorzystane' field. 
             $userWorkingDaysUsed = $leaveModel->countUserWorkingDaysUsed(
-                $session->get('id'),
+                $userId,
                 $calendarId['id'],
                 $data['year']
             );
@@ -214,7 +216,7 @@ class CalendarController extends Controller
 
             //Get days in month when user had leave and mark it on calendar.
             $datesOfLeave = $leaveModel->getUserDaysFromTo(
-                $session->get('id'),
+                $userId,
                 $calendarId['id'],
                 $data['month'],
                 $data['year']
@@ -235,9 +237,11 @@ class CalendarController extends Controller
     public function create()
     {
         $session = session();
+        $userId = $session->get('id');
+        $accountTypeId = $session->get('account_type_id');
 
         //If someone with diffrent account types gets here, redirect him to his main view.
-        if ($session->get('account_type_id') != 1) {
+        if ($accountTypeId != 1) {
             return redirect('user');
         }
 
@@ -254,7 +258,7 @@ class CalendarController extends Controller
             $calendarModel = new CalendarModel();
 
             $calendarModel->createCalendar(
-                $session->get('id'),
+                $userId,
                 $this->request->getPost('company_id'),
                 $this->request->getPost('name')
             );
@@ -264,7 +268,7 @@ class CalendarController extends Controller
         } else {
             $companyModel = new CompanyModel();
             //Get users list of companies which he added to database.
-            $companyList['companyList'] = $companyModel->getCompanyList($session->get('id'));
+            $companyList['companyList'] = $companyModel->getCompanyList($userId);
 
             //Displaying form of creating calendar for supervisor.
             echo view('Views/templates/header');
@@ -280,9 +284,11 @@ class CalendarController extends Controller
     public function join()
     {
         $session = session();
+        $userId = $session->get('id');
+        $accountTypeId = $session->get('account_type_id');
 
         //If someone with diffrent account types gets here, redirect him to his main view.
-        if ($session->get('account_type_id') != 2) {
+        if ($accountTypeId != 2) {
             return redirect('user');
         }
 
@@ -302,7 +308,7 @@ class CalendarController extends Controller
 
             $calendarUserModel = new CalendarUserModel();
 
-            if ($calendarUserModel->joinCalendar($session->get('id'), $this->request->getPost('invite_code'))) {
+            if ($calendarUserModel->joinCalendar($userId, $this->request->getPost('invite_code'))) {
                 //If user joined calendar redirect him to his main page.
                 return redirect('user');
             } else {
