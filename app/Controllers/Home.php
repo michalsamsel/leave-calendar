@@ -10,6 +10,12 @@ class Home extends BaseController
 	*/
 	public function index()
 	{
+		$session = session();
+		if ($session->get('id') != null) {
+			//If user is logged in, redirect him to his main page.
+			return redirect('user');
+		}
+
 		echo view('Views/templates/header');
 		echo view('Views/home/menu');
 		echo view('Views/templates/footer');

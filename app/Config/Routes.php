@@ -35,6 +35,7 @@ $routes->get('/', 'Home::index');
 $routes->get('user', 'User::index');
 $routes->match(['get', 'post'], 'user/register', 'User::register');
 $routes->get('user/login', 'User::login');
+$routes->get('user/logout', 'User::logout');
 
 $routes->match(['get', 'post'], 'company/create', 'Company::create');
 

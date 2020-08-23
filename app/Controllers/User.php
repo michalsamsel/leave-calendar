@@ -119,6 +119,12 @@ class User extends Controller
     */
     public function login()
     {
+        $session = session();
+        if ($session->get('id') != null) {
+            //If user is logged in, redirect him to his main page.
+            return redirect('user');
+        }
+
         $validationLoginError['errorMessage'] = '';
 
         $validationErrorMessage = [
@@ -157,5 +163,17 @@ class User extends Controller
             echo view('Views/user/login', $validationLoginError);
             echo view('Views/templates/footer');
         }
+    }
+
+    /*
+    * This controller should destroy session.
+    * After that redirect user to main page.
+    */
+    public function logout()
+    {
+        $session = session();
+        $session->destroy();
+
+        return redirect('/');
     }
 }
