@@ -146,6 +146,21 @@ class Calendar extends Controller
                 $leaveModel->createLeave($leaveList);
             }
 
+            $allDaysOfLeaveUsed = $leaveModel->countAllWorkingDaysUsed(
+                $calendarId['id'],
+                $data['year']
+            );
+
+            //Get days in month when users have leave and mark it on calendar.
+            $datesOfLeave = $leaveModel->getAllDaysFromTo(                
+                $calendarId['id'],
+                $data['month'],
+                $data['year']
+            );
+            $data['leaveDates'] = $datesOfLeave;
+
+            $data['test'] = $allDaysOfLeaveUsed;
+
             echo view('Views/templates/header');
             echo view('Views/calendar/calendarOwner', $data);
             echo view('Views/templates/footer');
@@ -185,20 +200,17 @@ class Calendar extends Controller
             }
 
             //Get number of days which user used for leaves and display them in 'wykorzystane' field. 
-            $userWorkingDaysUsed = $leaveModel->countUserDays(
+            $userWorkingDaysUsed = $leaveModel->countUserWorkingDaysUsed(
                 $session->get('id'),
                 $calendarId['id'],
                 $data['year']
             );
 
-            if(empty($userWorkingDaysUsed['working_days_used']))
-            {
+            if (empty($userWorkingDaysUsed['working_days_used'])) {
                 $data['userWorkingDaysUsed'] = 0;
-            }
-            else
-            {
+            } else {
                 $data['userWorkingDaysUsed'] = $userWorkingDaysUsed['working_days_used'];
-            }            
+            }
 
             //Get days in month when user had leave and mark it on calendar.
             $datesOfLeave = $leaveModel->getUserDaysFromTo(
