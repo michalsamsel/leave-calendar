@@ -11,7 +11,7 @@ use App\Models\CalendarUserModel;
 class UserController extends Controller
 {
     /*
-    * This controller loads pages based on type of account.
+    * This method loads pages based on type of account.
         Supervisor and worker have diffrent functions so they have diffrent views.
     */
     public function index()
@@ -44,7 +44,7 @@ class UserController extends Controller
         echo view('Views/templates/footer');
     }
     /*
-    * This controller lets users create a new accounts.
+    * This method lets users create a new accounts.
     * To work on website users need to have an account.
     */
     public function register()
@@ -109,7 +109,7 @@ class UserController extends Controller
     }
 
     /*
-    * This controller creates session after successful login to website.
+    * This method creates session after successful login to website.
     */
     public function login()
     {
@@ -163,7 +163,7 @@ class UserController extends Controller
     }
 
     /*
-    * This controller should destroy session.
+    * This method should destroy session.
     * After that redirect user to main page.
     */
     public function logout()

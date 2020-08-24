@@ -37,7 +37,7 @@ $monthNames = [
 
 <?= \Config\Services::validation()->listErrors(); ?>
 <?php if ($accountTypeId == 1) : ?>
-    <form action="<?= route_to('App\Controllers\Calendar::index', $invite_code, $year, $month) ?>" method="post">
+    <form action="<?= route_to('App\Controllers\CalendarController::index ', $invite_code, $month, $year) ?>" method="post">
     <?php elseif ($accountTypeId == 2) : ?>
         <form action="<?= route_to('App\Controllers\DaysOfLeaveController::update', $invite_code) ?>" method="post">
         <?php endif ?>

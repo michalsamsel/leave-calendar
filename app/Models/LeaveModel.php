@@ -25,7 +25,9 @@ class LeaveModel extends Model
     */
     public function createLeave(array $data)
     {
-        return $this->insertBatch($data);
+        if (!empty($data)) {
+            return $this->insertBatch($data);
+        }
     }
 
     /*

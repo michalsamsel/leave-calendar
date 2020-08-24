@@ -10,8 +10,8 @@ class LeaveController extends Controller
 {
 
     /*
-    * This controller should replace validation in calendar::index
-    * But for now there is something wrong.
+    * This method saves leaves in database
+    * For some reason form still goes to CalendarController. For now i will set form to CalendarController
     */
     public function update(string $inviteCode, int $year)
     {

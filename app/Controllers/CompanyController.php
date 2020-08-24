@@ -8,7 +8,7 @@ use App\Models\CompanyModel;
 class CompanyController extends Controller
 {
     /*
-    * This controller creates a new company on user demand.
+    * This method creates a new company on user demand.
     * User passes information about companies in given html form.
     */
     public function create()

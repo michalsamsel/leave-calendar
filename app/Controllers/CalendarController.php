@@ -12,7 +12,7 @@ use App\Models\UserModel;
 
 class CalendarController extends Controller
 {
-    /* This controller shows calendar for user.
+    /* This method shows calendar for user.
     * It also calculates date based on given,
     when country holiday days will happend.
     */
@@ -238,7 +238,7 @@ class CalendarController extends Controller
     }
 
     /*
-    * This controller creates new calendar.
+    * This method creates new calendar.
     * User passes information about name(not required) of new calendar and for which company he creates it.
     * List of companies are downloaded from database for specific user.
     */
@@ -286,7 +286,7 @@ class CalendarController extends Controller
     }
 
     /*
-    * This controller let's users join calendars.
+    * This method let's users join calendars.
     * User join callendar by writing invite code provided by his supervisor.
     */
     public function join()
