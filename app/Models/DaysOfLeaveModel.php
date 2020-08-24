@@ -72,7 +72,7 @@ class DaysOfLeaveModel extends Model
 
         return $this->asArray()
             ->where($data)
-            ->select('number_of_days')
+            ->select(['user_id', 'number_of_days'])
             ->first();
     }
 

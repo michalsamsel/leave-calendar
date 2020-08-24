@@ -42,7 +42,11 @@ $routes->match(['get', 'post'], 'company/create', 'CompanyController::create');
 $routes->match(['get', 'post'], 'calendar/create', 'CalendarController::create');
 $routes->match(['get', 'post'], 'calendar/join', 'CalendarController::join');
 $routes->get('calendar/(:alphanum)', 'CalendarController::index/$1');
-$routes->match(['get','post'],'calendar/(:alphanum)/month/(:num)/year/(:num)', 'CalendarController::index/$1/$2/$3');
+$routes->match(['get', 'post'], 'calendar/(:alphanum)/month/(:num)/year/(:num)', 'CalendarController::index/$1/$2/$3');
+
+$routes->post('days/update/(:alphanum)', 'DaysOfLeaveController::update/$1');
+
+$routes->match(['get', 'post'], '/leave/(:alphanum)/year/(:num)', 'Leave::update/$1/$2');
 
 /**
  * --------------------------------------------------------------------

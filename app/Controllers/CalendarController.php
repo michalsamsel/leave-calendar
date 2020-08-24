@@ -14,20 +14,24 @@ class CalendarController extends Controller
 {
     /* This controller shows calendar for user.
     * It also calculates date based on given,
-        when country holiday days will happend.
+    when country holiday days will happend.
     */
     public function index(string $invite_code, int $month = null, int $year = null)
     {
         $session = session();
         $userId = $session->get('id');
-
+        $accountTypeId = $session->get('account_type_id');
+        $firstName = $session->get('first_name');
+        $lastName = $session->get('last_name');
+        
         $calendarModel = new CalendarModel();
         $calendarId = $calendarModel->getId($invite_code);
         $calendarOwnerId = $calendarModel->getOwnerId($invite_code);
 
         $calendarUserModel = new CalendarUserModel();
-        $leaveModel = new LeaveModel();
         $daysOfLeaveModel = new DaysOfLeaveModel();
+        $leaveModel = new LeaveModel();
+        $userModel = new UserModel();
 
         //If someone didnt joined calenadr by code, redirect him to his main view.
         if (
@@ -85,147 +89,151 @@ class CalendarController extends Controller
 
         $data['publicHolidays'] = $publicHolidays;
 
-        if (session()->get('account_type_id') == 1) {
-            //Supervisor view.
-            $userModel = new UserModel();
 
-            $data['userList'] = $userModel->getUserList($invite_code);
-            $data['numberOfDaysToLeave'] = $daysOfLeaveModel->getAllUsersNumberOfDays($data['invite_code'], $data['year']);
+        switch ($accountTypeId) {
+            case 1: //Supervisor view.            
+                $data['userList'] = $userModel->getUserList($invite_code);
+                $data['numberOfDaysToLeave'] = $daysOfLeaveModel->getAllUsersNumberOfDays($data['invite_code'], $data['year']);
 
-            if ($this->request->getMethod() === 'post') {
-                $leaveList = $this->request->getPost('leaveList');
+                // This whole if block should be placed in LeaveController but for now something is not working with Leave Controller.
+                if ($this->request->getMethod() === 'post') {
+                    $leaveList = $this->request->getPost('leaveList');
 
-                foreach ($leaveList as $leave) {
-                    if (empty($leave['from']) && empty($leave['to'])) {
-                        //If for some worker date of leave will not be choosen, skip him.
-                        unset($leaveList[$leave['user_id']]);
-                        continue;
-                    }
-
-                    //If only one date is choosen, save this as only 1 day of leave.
-                    if (empty($leave['from'])) {
-                        $leave['from'] = $leave['to'];
-                    } else if (empty($leave['to'])) {
-                        $leave['to'] = $leave['from'];
-                    }
-
-                    //If someone swaps first day and last day of leave, replace their values.
-                    if ($leave['from'] > $leave['to']) {
-                        $temporaryDate = $leave['from'];
-                        $leave['from'] = $leave['to'];
-                        $leave['to'] = $temporaryDate;
-                    }
-
-                    //Count number of working days. Skip weekends and country holidays.
-                    $workingDays = 0;
-
-                    //Count days from first day of leave to last day of leave.
-                    for ($i = $leave['from']; $i <= $leave['to']; $i++) {
-                        $splitedDate = explode("-", $i); //Year[0]-Month[1]-Day[2]
-
-                        $dayOfWeek = date('w', mktime(0, 0, 0, $splitedDate[1], $splitedDate[2] - 1, $splitedDate[0]));
-                        $selectedDate = date(mktime(0, 0, 0, $splitedDate[1], $splitedDate[2], $splitedDate[0]));
-                        if ($dayOfWeek < 5 && !in_array($selectedDate, $publicHolidays)) {
-                            //If not weekend and not public holiday, increase counter
-                            $workingDays++;
+                    foreach ($leaveList as $leave) {
+                        if (empty($leave['from']) && empty($leave['to'])) {
+                            //If for some worker date of leave will not be choosen, skip him.
+                            unset($leaveList[$leave['user_id']]);
+                            continue;
                         }
+
+                        //If only one date is choosen, save this as only 1 day of leave.
+                        if (empty($leave['from'])) {
+                            $leave['from'] = $leave['to'];
+                        } else if (empty($leave['to'])) {
+                            $leave['to'] = $leave['from'];
+                        }
+
+                        //If someone swaps first day and last day of leave, replace their values.
+                        if ($leave['from'] > $leave['to']) {
+                            $temporaryDate = $leave['from'];
+                            $leave['from'] = $leave['to'];
+                            $leave['to'] = $temporaryDate;
+                        }
+
+                        //Count number of working days. Skip weekends and country holidays.
+                        $workingDays = 0;
+
+                        //Count days from first day of leave to last day of leave.
+                        for ($i = $leave['from']; $i <= $leave['to']; $i++) {
+                            $splitedDate = explode("-", $i); //Year[0]-Month[1]-Day[2]
+
+                            $dayOfWeek = date('w', mktime(0, 0, 0, $splitedDate[1], $splitedDate[2] - 1, $splitedDate[0]));
+                            $selectedDate = date(mktime(0, 0, 0, $splitedDate[1], $splitedDate[2], $splitedDate[0]));
+                            if ($dayOfWeek < 5 && !in_array($selectedDate, $publicHolidays)) {
+                                //If not weekend and not public holiday, increase counter
+                                $workingDays++;
+                            }
+                        }
+
+                        //If the single day of leave was choosen at weekend or at public holiday, dont save it in database.
+                        if ($workingDays === 0) {
+                            unset($leaveList[$leave['user_id']]);
+                            continue;
+                        }
+
+                        $leave['calendar_id'] = $calendarId['id'];
+                        $leave['working_days_used'] = $workingDays;
+                        $leave['leave_type_id'] = 1;
+
+                        //Update modified array for selected user.
+                        $leaveList[$leave['user_id']] = $leave;
                     }
 
-                    //If the single day of leave was choosen at weekend or at public holiday, dont save it in database.
-                    if ($workingDays === 0) {
-                        unset($leaveList[$leave['user_id']]);
-                        continue;
-                    }
-
-                    $leave['calendar_id'] = $calendarId['id'];
-                    $leave['working_days_used'] = $workingDays;
-
-                    //Update modified array for selected user.
-                    $leaveList[$leave['user_id']] = $leave;
+                    $leaveModel->createLeave($leaveList);
                 }
 
-                $leaveModel = new LeaveModel();
-                $leaveModel->createLeave($leaveList);
-            }
-
-            $allDaysOfLeaveUsed = $leaveModel->countAllWorkingDaysUsed(
-                $calendarId['id'],
-                $data['year']
-            );
-
-            //Get days in month when users have leave and mark it on calendar.
-            $datesOfLeave = $leaveModel->getAllDaysFromTo(
-                $calendarId['id'],
-                $data['month'],
-                $data['year']
-            );
-            $data['leaveDates'] = $datesOfLeave;
-
-            $data['test'] = $allDaysOfLeaveUsed;
-
-            echo view('Views/templates/header');
-            echo view('Views/calendar/calendarOwner', $data);
-            echo view('Views/templates/footer');
-        } else if (session()->get('account_type_id') == 2) {
-            //Worker view
-            $validationErrorMessage = [
-                'number_of_days' => [
-                    'max_length' => 'Nie można podać wyższej wartości niż 99',
-                    'greater_than_equal_to' => 'Nie można podać ujemnej ilości dni.',
-                    'required' => 'Pole nie może być puste',
-                ],
-            ];
-
-            if ($this->request->getMethod() === 'post' && $this->validate([
-                'number_of_days' => 'max_length[2]|greater_than_equal_to[0]|required',
-            ], $validationErrorMessage)) {
-                $daysOfLeaveModel->updateNumberOfDays(
-                    $userId,
-                    $invite_code,
-                    $this->request->getPost('year'),
-                    $this->request->getPost('number_of_days')
+                $allDaysOfLeaveUsed = $leaveModel->countAllWorkingDaysUsed(
+                    $calendarId['id'],
+                    $data['year']
                 );
-            }
 
-            //Get number of days user have at all and display them in 'pula' field.
-            $userDaysOfLeave = $daysOfLeaveModel->getNumberOfDays(
-                $userId,
-                $data['invite_code'],
-                $data['year']
-            );
+                //Get days in month when users have leave and mark it on calendar.
+                $datesOfLeave = $leaveModel->getAllDaysFromTo(
+                    $calendarId['id'],
+                    $data['month'],
+                    $data['year']
+                );
+                $data['leaveDates'] = $datesOfLeave;
+                
+                $data['workingDaysUsed'] = $allDaysOfLeaveUsed;
 
-            //If number of days wasnt updated yet, set them as 0 days.
-            if (empty($userDaysOfLeave['number_of_days'])) {
-                $data['numberOfDays'] = 0;
-            } else {
-                $data['numberOfDays'] = $userDaysOfLeave['number_of_days'];
-            }
+                echo view('Views/templates/header');                
+                echo view('Views/calendar/calendarView', $data);
+                echo view('Views/calendar/calendarLegend');
+                echo view('Views/templates/footer');
+                break;
 
-            //Get number of days which user used for leaves and display them in 'wykorzystane' field. 
-            $userWorkingDaysUsed = $leaveModel->countUserWorkingDaysUsed(
-                $userId,
-                $calendarId['id'],
-                $data['year']
-            );
+            case 2: //Worker view
 
-            if (empty($userWorkingDaysUsed['working_days_used'])) {
-                $data['userWorkingDaysUsed'] = 0;
-            } else {
-                $data['userWorkingDaysUsed'] = $userWorkingDaysUsed['working_days_used'];
-            }
+                //Get number of days user have at all and display them in 'pula' field.
+                $userDaysOfLeave = $daysOfLeaveModel->getNumberOfDays(
+                    $userId,
+                    $data['invite_code'],
+                    $data['year']
+                );
 
-            //Get days in month when user had leave and mark it on calendar.
-            $datesOfLeave = $leaveModel->getUserDaysFromTo(
-                $userId,
-                $calendarId['id'],
-                $data['month'],
-                $data['year']
-            );
-            $data['leaveDates'] = $datesOfLeave;
+                //If number of days wasnt updated yet, set them as 0 days.
+                if (empty($userDaysOfLeave['number_of_days'])) {
+                    $data['numberOfDaysToLeave'][0] = [
+                        'user_id' => $userId,
+                        'number_of_days' => 0,
+                    ];
+                } else {
+                    $data['numberOfDaysToLeave'][0] = $userDaysOfLeave;
+                }
 
-            echo view('Views/templates/header');
-            echo view('Views/calendar/calendarWorker', $data);
-            echo view('Views/templates/footer');
+                //Get number of days which user used for leaves and display them in 'wykorzystane' field. 
+                $userWorkingDaysUsed = $leaveModel->countUserWorkingDaysUsed(
+                    $userId,
+                    $calendarId['id'],
+                    $data['year']
+                );
+
+                if (empty($userWorkingDaysUsed['working_days_used'])) {
+                    $data['workingDaysUsed'][0] = [
+                        'user_id' => $userId,
+                        'working_days_used' => 0,
+                    ];
+                } else {
+                    $data['workingDaysUsed'][0] = [
+                        'user_id' => $userId,
+                        'working_days_used' => $userWorkingDaysUsed['working_days_used'],
+                    ];
+                }
+
+                //Get days in month when user had leave and mark it on calendar.
+                $datesOfLeave = $leaveModel->getUserDaysFromTo(
+                    $userId,
+                    $calendarId['id'],
+                    $data['month'],
+                    $data['year']
+                );
+                $data['leaveDates'] = $datesOfLeave;
+
+                //Set data about current loged user.
+                $user = [
+                    'id' => $userId,
+                    'first_name' => $firstName,
+                    'last_name' => $lastName,
+                ];
+
+                $data['userList'][0] = $user;
+
+                echo view('Views/templates/header');
+                echo view('Views/calendar/calendarView', $data);
+                echo view('Views/templates/footer');
+
+                break;
         }
     }
 
@@ -266,7 +274,7 @@ class CalendarController extends Controller
 
             //After successful login redirect user to his main view.
             return redirect('user');
-        } else {           
+        } else {
             //Get users list of companies which he added to database.
             $companyList['companyList'] = $companyModel->getCompanyList($userId);
 
@@ -306,7 +314,7 @@ class CalendarController extends Controller
 
         if ($this->request->getMethod() === 'post' && $this->validate([
             'invite_code' => 'alpha_numeric|min_length[6]|max_length[6]',
-        ], $validationErrorMessage)) {            
+        ], $validationErrorMessage)) {
 
             if ($calendarUserModel->joinCalendar($userId, $this->request->getPost('invite_code'))) {
                 //If user joined calendar redirect him to his main page.
