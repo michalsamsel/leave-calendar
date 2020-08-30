@@ -23,7 +23,7 @@ class CalendarController extends Controller
         $accountTypeId = $session->get('account_type_id');
         $firstName = $session->get('first_name');
         $lastName = $session->get('last_name');
-        
+
         $calendarModel = new CalendarModel();
         $calendarId = $calendarModel->getId($invite_code);
         $calendarOwnerId = $calendarModel->getOwnerId($invite_code);
@@ -95,63 +95,6 @@ class CalendarController extends Controller
                 $data['userList'] = $userModel->getUserList($invite_code);
                 $data['numberOfDaysToLeave'] = $daysOfLeaveModel->getAllUsersNumberOfDays($data['invite_code'], $data['year']);
 
-                // This whole if block should be placed in LeaveController but for now something is not working with Leave Controller.
-                if ($this->request->getMethod() === 'post') {
-                    $leaveList = $this->request->getPost('leaveList');
-
-                    foreach ($leaveList as $leave) {
-                        if (empty($leave['from']) && empty($leave['to'])) {
-                            //If for some worker date of leave will not be choosen, skip him.
-                            unset($leaveList[$leave['user_id']]);
-                            continue;
-                        }
-
-                        //If only one date is choosen, save this as only 1 day of leave.
-                        if (empty($leave['from'])) {
-                            $leave['from'] = $leave['to'];
-                        } else if (empty($leave['to'])) {
-                            $leave['to'] = $leave['from'];
-                        }
-
-                        //If someone swaps first day and last day of leave, replace their values.
-                        if ($leave['from'] > $leave['to']) {
-                            $temporaryDate = $leave['from'];
-                            $leave['from'] = $leave['to'];
-                            $leave['to'] = $temporaryDate;
-                        }
-
-                        //Count number of working days. Skip weekends and country holidays.
-                        $workingDays = 0;
-
-                        //Count days from first day of leave to last day of leave.
-                        for ($i = $leave['from']; $i <= $leave['to']; $i++) {
-                            $splitedDate = explode("-", $i); //Year[0]-Month[1]-Day[2]
-
-                            $dayOfWeek = date('w', mktime(0, 0, 0, $splitedDate[1], $splitedDate[2] - 1, $splitedDate[0]));
-                            $selectedDate = date(mktime(0, 0, 0, $splitedDate[1], $splitedDate[2], $splitedDate[0]));
-                            if ($dayOfWeek < 5 && !in_array($selectedDate, $publicHolidays)) {
-                                //If not weekend and not public holiday, increase counter
-                                $workingDays++;
-                            }
-                        }
-
-                        //If the single day of leave was choosen at weekend or at public holiday, dont save it in database.
-                        if ($workingDays === 0) {
-                            unset($leaveList[$leave['user_id']]);
-                            continue;
-                        }
-
-                        $leave['calendar_id'] = $calendarId['id'];
-                        $leave['working_days_used'] = $workingDays;
-                        $leave['leave_type_id'] = 1;
-
-                        //Update modified array for selected user.
-                        $leaveList[$leave['user_id']] = $leave;
-                    }
-
-                    $leaveModel->createLeave($leaveList);
-                }
-
                 $allDaysOfLeaveUsed = $leaveModel->countAllWorkingDaysUsed(
                     $calendarId['id'],
                     $data['year']
@@ -164,10 +107,10 @@ class CalendarController extends Controller
                     $data['year']
                 );
                 $data['leaveDates'] = $datesOfLeave;
-                
+
                 $data['workingDaysUsed'] = $allDaysOfLeaveUsed;
 
-                echo view('Views/templates/header');                
+                echo view('Views/templates/header');
                 echo view('Views/calendar/calendarView', $data);
                 echo view('Views/calendar/calendarLegend');
                 echo view('Views/templates/footer');

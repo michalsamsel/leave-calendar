@@ -31,22 +31,17 @@ $routes->setAutoRoute(true);
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
 $routes->get('/', 'HomeController::index');
-
 $routes->get('user', 'UserController::index');
 $routes->match(['get', 'post'], 'user/register', 'UserController::register');
 $routes->match(['get', 'post'], 'user/login', 'UserController::login');
 $routes->get('user/logout', 'UserController::logout');
-
 $routes->match(['get', 'post'], 'company/create', 'CompanyController::create');
-
 $routes->match(['get', 'post'], 'calendar/create', 'CalendarController::create');
 $routes->match(['get', 'post'], 'calendar/join', 'CalendarController::join');
 $routes->get('calendar/(:alphanum)', 'CalendarController::index/$1');
 $routes->match(['get', 'post'], 'calendar/(:alphanum)/month/(:num)/year/(:num)', 'CalendarController::index/$1/$2/$3');
-
 $routes->post('days/update/(:alphanum)', 'DaysOfLeaveController::update/$1');
-
-$routes->match(['get', 'post'], '/leave/(:alphanum)/year/(:num)', 'Leave::update/$1/$2');
+$routes->match(['get', 'post'], '/leave/(:alphanum)/year/(:num)', 'LeaveController::update/$1/$2');
 
 /**
  * --------------------------------------------------------------------

@@ -8,14 +8,14 @@ use App\Models\LeaveModel;
 
 class LeaveController extends Controller
 {
-
     /*
-    * This method saves leaves in database
-    * For some reason form still goes to CalendarController. For now i will set form to CalendarController
+    * This method saves leaves in database    
     */
     public function update(string $inviteCode, int $year)
     {
         $calendarModel = new CalendarModel();
+        $calendarId = $calendarModel->getId($inviteCode);
+
         $leaveModel = new LeaveModel();
 
         $publicHolidays = [
@@ -84,7 +84,7 @@ class LeaveController extends Controller
 
                     $dayOfWeek = date('w', mktime(0, 0, 0, $splitedDate[1], $splitedDate[2], $splitedDate[0]));
                     $selectedDate = date(mktime(0, 0, 0, $splitedDate[1], $splitedDate[2], $splitedDate[0]));
-                    if (($dayOfWeek == 0 || $dayOfWeek == 6)  && !in_array($selectedDate, $publicHolidays)) {
+                    if (($dayOfWeek != 0 && $dayOfWeek != 6)  && !in_array($selectedDate, $publicHolidays)) {
                         //If not weekend and not public holiday, increase counter
                         $workingDays++;
                     }
@@ -96,14 +96,13 @@ class LeaveController extends Controller
                     continue;
                 }
 
-                $leave['calendar_id'] = $calendarModel->getId($inviteCode);
+                $leave['calendar_id'] = $calendarId['id'];
                 $leave['working_days_used'] = $workingDays;
                 $leave['leave_type_id'] = 1;
 
-                //Update modified array for selected user.
-                $leaveList[$leave['user_id']] = $leave;
+                //Update modified array for selected user.                
+                $leaveModel->createLeave($leave);
             }
-            $leaveModel->createLeave($leaveList);
             echo view('Views/templates/header');
             echo view('Views/leave/success');
             echo view('Views/templates/footer');

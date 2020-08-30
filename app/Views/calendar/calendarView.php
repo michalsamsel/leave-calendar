@@ -37,10 +37,11 @@ $monthNames = [
 
 <?= \Config\Services::validation()->listErrors(); ?>
 <?php if ($accountTypeId == 1) : ?>
-    <form action="<?= route_to('App\Controllers\CalendarController::index ', $invite_code, $month, $year) ?>" method="post">
+    <form action="<?= route_to('App\Controllers\LeaveController::update', $invite_code, $year) ?>" method="post">
     <?php elseif ($accountTypeId == 2) : ?>
         <form action="<?= route_to('App\Controllers\DaysOfLeaveController::update', $invite_code) ?>" method="post">
         <?php endif ?>
+
         <?php if (esc($month) > 1) : ?>
             <!--Check if buttons should jump to previous/next month or year-->
             <div class="row justify-content-center">
