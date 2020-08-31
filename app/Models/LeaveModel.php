@@ -98,4 +98,54 @@ class LeaveModel extends Model
             ->select(['user_id', 'from', 'to'])
             ->findAll();
     }
+
+    public function getLeavesInRange(int $userId, int $calendarId, $from, $to)
+    {
+        return $this->query('
+        SELECT `id` 
+        FROM `leave` 
+        WHERE `user_id`=:userId: AND `calendar_id`=:calendarId:
+        AND `from` BETWEEN :from: AND :to:
+        AND `to` BETWEEN :from: AND :to:;'
+        , [
+            'userId' => $userId, 
+            'calendarId' => $calendarId, 
+            'from' => $from, 
+            'to' => $to])
+        ->getResultArray();
+    }
+
+    public function deleteRow(array $idArray)
+    {
+        foreach ($idArray as $id) {
+            $this->delete(['id' => $id['id']]);
+        }
+    }
+
+    public function getTo(int $userId, int $calendarId, $from)
+    {
+        return $this->query('
+        SELECT `to` 
+        FROM `leave` 
+        WHERE `user_id`=? AND `calendar_id`=? AND ? BETWEEN `from` AND `to`;',
+        [$userId, $calendarId, $from])
+        ->getResultArray();
+    }
+    
+    public function getFrom(int $userId, int $calendarId, $to)
+    {
+        return $this->query('
+        SELECT `from` 
+        FROM `leave` 
+        WHERE `user_id`=? AND `calendar_id`=? AND ? BETWEEN `from` AND `to`;',
+        [$userId, $calendarId, $to])
+        ->getResultArray();
+    }
 }
+
+//between
+//Sprawdzenie czy w danym zakresie nie ma juz jakis urlopow
+//SELECT `from` FROM `leave` WHERE `user_id`=$userId AND `calendar_id`=$calendarId AND $from BETWEEN `from` AND `to` //Poczatek
+//SELECT `to` FROM `leave` WHERE `user_id`=$userId AND `calendar_id`=$calendarId AND $from BETWEEN `from` AND `to`  //Koniec
+//Sprawdzenie czy cos pomiedzy jesli tak to kasacja po id
+//Update nowego leava dla danego usera

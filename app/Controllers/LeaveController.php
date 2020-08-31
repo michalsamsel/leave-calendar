@@ -68,6 +68,26 @@ class LeaveController extends Controller
                     $leave['to'] = $leave['from'];
                 }
 
+                //Get the last avaible date in database and replace it with current 'from'
+                $leaveToDate = $leaveModel->getTo($leave['user_id'], $calendarId['id'], $leave['from']);
+                if (!empty($leaveToDate)) {
+                    $leaveToDate = $leaveToDate[0]['to'];
+                    $splitedDate = explode("-", $leaveToDate);
+                    $leaveToDate = date("Y-n-d", mktime(0, 0, 0, $splitedDate[1], $splitedDate[2], $splitedDate[0]));
+                    $leaveToDate = strtotime("1 day", $leaveToDate);
+                    $leave['from'] = $leaveToDate;
+                }
+
+                //Get the first avaible date in database and replace it with current 'to'
+                $leaveFromDate = $leaveModel->getFrom($leave['user_id'], $calendarId['id'], $leave['to']);
+                if (!empty($leaveFromDate)) {
+                    $leaveFromDate = $leaveFromDate[0]['from'];
+                    $splitedDate = explode("-", $leaveFromDate);
+                    $leaveFromDate = date("Y-n-d", mktime(0, 0, 0, $splitedDate[1], $splitedDate[2], $splitedDate[0]));
+                    $leaveFromDate = strtotime("-1 day", $leaveFromDate);
+                    $leave['to'] = $leaveFromDate;
+                }
+
                 //If someone swaps first day and last day of leave, replace their values.
                 if ($leave['from'] > $leave['to']) {
                     $temporaryDate = $leave['from'];
@@ -80,7 +100,7 @@ class LeaveController extends Controller
 
                 //Count days from first day of leave to last day of leave.
                 for ($i = $leave['from']; $i <= $leave['to']; $i++) {
-                    $splitedDate = explode("-", $i); //Year[0]-Month[1]-Day[2]
+                    $splitedDate = explode("-", $i); //Year-Month-Day
 
                     $dayOfWeek = date('w', mktime(0, 0, 0, $splitedDate[1], $splitedDate[2], $splitedDate[0]));
                     $selectedDate = date(mktime(0, 0, 0, $splitedDate[1], $splitedDate[2], $splitedDate[0]));
@@ -100,8 +120,13 @@ class LeaveController extends Controller
                 $leave['working_days_used'] = $workingDays;
                 $leave['leave_type_id'] = 1;
 
-                //Update modified array for selected user.                
+                $leavesInRange = $leaveModel->getLeavesInRange($leave['user_id'], $calendarId['id'], $leave['from'], $leave['to']);
+
+                //Update modified array for selected user.
+                //$this->db->transStart();
+                $leaveModel->deleteRow($leavesInRange);
                 $leaveModel->createLeave($leave);
+                //$this->db->transComplete();
             }
             echo view('Views/templates/header');
             echo view('Views/leave/success');
